@@ -1,3 +1,6 @@
 .hie/
+.hpc/
+.hspec-failures
 .stack-work/
+dist-newstyle/
 stack.yaml.lock

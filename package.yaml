@@ -22,13 +22,24 @@ dependencies:
 - acid-state
 - base >= 4.7 && < 5
 - mtl
+- regex-do
 - red-black-tree
+- relude
 - safecopy
 - text
 
 default-extensions:
+  - BlockArguments
+  - DataKinds
   - DeriveDataTypeable
-  - TemplateHaskell
+  - DeriveFunctor
+  - FlexibleContexts
+  - FlexibleInstances
+  - GeneralizedNewtypeDeriving
+  - NoImplicitPrelude
+  - OverloadedStrings
+  - RecordWildCards
+  - StrictData
   - TypeFamilies
 
 library:
@@ -56,7 +67,7 @@ executables:
     - url-shortener
 
 tests:
-  shortener-test:
+  db-test:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:
@@ -64,4 +75,8 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
+    - exceptions
+    - filepath
+    - hspec
+    - temporary
     - url-shortener
