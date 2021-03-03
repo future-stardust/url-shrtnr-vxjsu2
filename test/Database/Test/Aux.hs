@@ -10,22 +10,22 @@ module Database.Test.Aux
 import Data.Acid
 import Database.State
 import Database.Common
+import Database.Url.Url
 import Database.User.User
 import Database.User.UserDB
+import qualified Database.Tree.Tree as BT
 import Test.Hspec
 
 import Control.Exception
 import Control.Monad.Catch (MonadMask)
 import Relude hiding (empty)
 import Relude.Extra (bimapBoth)
-import Data.RedBlackTree
-import Database.Url.Url
 import Data.Maybe (fromJust)
 
 import System.IO.Temp
 import System.FilePath ((</>))
 
-
+-- | Run AppDB monad
 run :: Tables -> AppDB a -> IO (Either DBError a)
 run t a = runExceptT (runReaderT (runAppDB a) t)
 
@@ -40,9 +40,8 @@ left (Right v) = error $ "[error] expected 'Left e', but got: " <> show v
 -- | Opens db state in given dir
 initTables :: FilePath -> IO Tables
 initTables dir = do
-  -- TODO: implempent temporary dir for tests
-  userTable <- openLocalStateFrom (dir </> "userTable") (Table empty      :: UserTable)
-  urlTable  <- openLocalStateFrom (dir </> "urlTable")  (Table (empty, 0) :: UrlTable)
+  userTable <- openLocalStateFrom (dir </> "userTable") (Table BT.empty      :: UserTable)
+  urlTable  <- openLocalStateFrom (dir </> "urlTable")  (Table (BT.empty, 0) :: UrlTable)
   return (userTable, urlTable)
 
 -- | Opens connection, runs callback, closes connection
@@ -67,4 +66,3 @@ class Compare a where
 instance Compare User where
   cmp (User uname1 urls1 hash1) (User uname2 urls2 hash2) =
     uname1 == uname2 && urls1 == urls2 && hash1 == hash2
-

@@ -1,14 +1,6 @@
 module Main where
 
-import qualified Data.Text as T
-import           Data.RedBlackTree
-import           Data.Acid
-
-import           Data.SafeCopy
-import           System.Environment   (getArgs)
-import Data.Maybe
-import Relude hiding (empty, find)
-
+import Relude
 
 main :: IO ()
 main = putTextLn "kek"

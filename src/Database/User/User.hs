@@ -1,4 +1,6 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TemplateHaskell       #-}
+{-# LANGUAGE ViewPatterns          #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 
 module Database.User.User
   ( TreeUser
@@ -15,35 +17,30 @@ module Database.User.User
   , unameHashNotNil
   ) where
 
+
 import Data.Acid
-import Relude hiding (find)
-import Database.Common
 import Data.SafeCopy
-import qualified Data.Text as T
-import Data.RedBlackTree
-import Control.Exception
+import Relude hiding (find)
+
+import Database.Common
+import qualified Database.Tree.Tree as BT
 
 -- | User representation in database
 data User = User
   { username :: Username   -- ^ user's username -- Unique
   , urls     :: [ShortUrl] -- ^ shortened url created by user
-  , hash     :: T.Text     -- ^ password hash
+  , hash     :: Hash       -- ^ password hash
   } deriving (Show)
 
 -- | Tree for user table
-type TreeUser  = RedBlackTree User
+type TreeUser  = BT.Tree Username User
 type UserTable = Table TreeUser
-
-instance Ord User where
-  (<=) (User u1 _ _) (User u2 _ _) = u1 <= u2
-  (<)  (User u1 _ _) (User u2 _ _) = u1 <  u2
-  (>)  (User u1 _ _) (User u2 _ _) = u1 >  u2
 
 instance Eq User where
   (==) (User u1 _ _) (User u2 _ _) = u1 == u2
 
-instance BinaryTreeNode User where
-  mergeNodes _ = id
+instance BT.HasIndex User Username where
+  getIndex = username
 
 instance SafeCopy User where
   putCopy User{..} = contain $ safePut username
@@ -52,32 +49,30 @@ instance SafeCopy User where
   getCopy = contain $ User <$> safeGet <*> safeGet <*> safeGet
 
 instance SafeCopy TreeUser where
-  putCopy = contain . safePut
-  getCopy = contain   safeGet
+  putCopy (BT.toList -> list) = contain $ safePut list
+  getCopy = contain $ BT.fromList <$> safeGet
 
 
 -- | Inserts `User` in db
 insertUser' :: User -> Update UserTable ()
-insertUser' user = do
-  Table tree <- get
-  put $ Table $ insert tree user
+insertUser' = modify . (<$>) . BT.insert
 
 -- | Adds given url to `User`'s `short` field
 updateUrlsUser' :: User -> ShortUrl -> Update UserTable ()
-updateUrlsUser' User{..} url = do
-  modify $ fmap $ flip insert $ User username (url : urls) hash
+updateUrlsUser' User{..} url =
+  modify . (<$>) . BT.insert $ User username (urls <> [url]) hash
 
 -- | Deletes given url from `User`'s `short` field
 -- optimise double traverse because of User
 deleteUrlUser' :: User -> ShortUrl -> Update UserTable ()
 deleteUrlUser' User{..} url = do
-  modify $ (<$>) $ flip insert $ User username (filter (/= url) urls) hash
+  modify . (<$>) . BT.insert $ User username (filter (/= url) urls) hash
 
 -- | Searches for `User` with given `Username` in db
 queryUser' :: Username -> Query UserTable (Maybe User)
 queryUser' uname = do
   Table tree <- ask
-  return $ find tree $ User uname [] T.empty
+  return $ BT.lookup uname tree
 
 $(makeAcidic ''UserTable ['insertUser', 'updateUrlsUser', 'queryUser', 'deleteUrlUser'])
 

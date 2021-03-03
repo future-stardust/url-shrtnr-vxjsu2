@@ -1,4 +1,6 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TemplateHaskell       #-}
+{-# LANGUAGE ViewPatterns          #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 
 module Database.Url.Url
   ( Url(..)
@@ -17,37 +19,27 @@ module Database.Url.Url
   , urlIsNil
   ) where
 
-import           Data.RedBlackTree
 import           Data.Acid
+import           Data.SafeCopy
+import           Relude
 
-import qualified Data.Text as T
-import Data.SafeCopy
-import Relude hiding (empty, find)
-import Database.Common
+import           Database.Common
+import qualified Database.Tree.Tree as BT
 
 -- | Url representation in database
 data Url = Url
   { orig  :: OrigUrl  -- ^ original url
   , short :: ShortUrl -- ^ shortened version of url -- Unique
-  } deriving (Show)
+  } deriving (Eq, Show)
 
 -- | Tree for url table
-type TreeUrl  = RedBlackTree Url
+type TreeUrl  = BT.Tree ShortUrl Url
 
 -- | UrlTable of urls tree and id
--- id grows +1 with each genUUID
 type UrlTable = Table (TreeUrl, UUID)
 
-instance Ord Url where
-  (<=) (Url s1 _) (Url s2 _) = s1 <= s2
-  (<)  (Url s1 _) (Url s2 _) = s1 <  s2
-  (>)  (Url s1 _) (Url s2 _) = s1 >  s2
-
-instance Eq Url where
-  (==) (Url _ s1) (Url _ s2) = s1 == s2
-
-instance BinaryTreeNode Url where
-  mergeNodes _ = id
+instance BT.HasIndex Url ShortUrl where
+  getIndex = short
 
 instance SafeCopy Url where
   putCopy Url{..} = contain $ safePut orig
@@ -55,24 +47,23 @@ instance SafeCopy Url where
   getCopy = contain $ Url <$> safeGet <*> safeGet
 
 instance SafeCopy TreeUrl where
-  putCopy = contain . safePut
-  getCopy = contain   safeGet
+  putCopy (BT.toList -> list) = contain $ safePut list
+  getCopy = contain $ BT.fromList <$> safeGet
 
 
 -- | Inserts `Url` in db
 insertUrl' :: Url -> Update UrlTable ()
-insertUrl' = modify . (<$>) . first . flip insert
+insertUrl' = modify . (<$>) . first . BT.insert
 
 -- | Searches for `OrigUrl` by given `ShortUrl`
 queryUrl' :: ShortUrl -> Query UrlTable (Maybe OrigUrl)
 queryUrl' url = do
   Table (tree, _) <- ask
-  return $ orig <$> find tree (Url T.empty url)
+  return $ orig <$> BT.lookup url tree
 
 -- | Deletes `Url` by given `ShortUrl`
--- FIXME: write own tree traverse
 deleteUrl' :: ShortUrl -> Update UrlTable ()
-deleteUrl' url = undefined
+deleteUrl' =  modify . (<$>) . first . BT.delete
 
 -- | Adds +1 to `UUID`
 updateUUID' :: Update UrlTable ()

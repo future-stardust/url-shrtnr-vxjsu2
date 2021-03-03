@@ -22,9 +22,9 @@ type DB m = (MonadIO m, MonadError DBError m, MonadReader Tables m)
 
 newtype AppDB a = AppDB
   { runAppDB :: ReaderT Tables (ExceptT DBError IO) a
-  } deriving ( Monad
-             , Functor
+  } deriving ( Functor
              , Applicative
+             , Monad
              , MonadReader Tables
              , MonadError DBError
              , MonadIO)

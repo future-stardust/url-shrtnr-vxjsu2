@@ -36,8 +36,6 @@ packages:
 #
 extra-deps:
 - acid-state-0.16.0.1@sha256:d43f6ee0b23338758156c500290c4405d769abefeb98e9bc112780dae09ece6f,6207
-- red-black-tree-0.1.0.0@sha256:62ef8200e8945d21afcc53a015779a27d6578d79d0e2d4dc6e8b3bcf9dabc8d4,1938
-- regex-do-3.2.2@sha256:933c07b2b441643b53f0bb587608b636b2621932c778d8874947d1e5f0b9207b,4256
 
 # - acme-missiles-0.3
 # - git: https://github.com/commercialhaskell/stack.git

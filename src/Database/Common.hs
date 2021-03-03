@@ -1,22 +1,23 @@
-{-# LANGUAGE GADTs #-}
-{-# LANGUAGE ConstraintKinds #-}
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE ConstraintKinds    #-}
+{-# LANGUAGE TemplateHaskell    #-}
 
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE DeriveAnyClass     #-}
+{-# LANGUAGE DeriveFunctor      #-}
+
+
 module Database.Common
   ( Table (..)
   , UUID
   , Username
+  , Hash
   , OrigUrl
   , ShortUrl
   , DBError(..)
-  , empty
   , shortUrlIsNil
   ) where
 
-import Data.RedBlackTree
 import Data.SafeCopy
 import qualified Data.Text as T
 import Relude hiding (empty, find)
@@ -29,18 +30,13 @@ type UUID     = Int
 -- and `ShortUrl` instead (?)
 -- | `User`'s username
 type Username = T.Text
+-- | `User`'s hashed password
+type Hash     = T.Text
 -- | Original url
 type OrigUrl  = T.Text
 -- | Shortened url
 type ShortUrl = T.Text
 
--- -- | Database error
--- data DBError = EUserExist  -- ^ user with such username already exists
---              | EUserNExist -- ^ username doesn't exist in db
---              | EUserNil    -- ^ username or hash is empty
---              | EUrlExist   -- ^ short url already exists
---              | EUrlNExist  -- ^ short url doesn't exist in db
---              deriving (Eq, Exception, Show)
 
 -- | Database error
 data DBError where
@@ -86,10 +82,6 @@ deriving anyclass instance Exception DBError
 newtype Table a = Table { unTable :: a } deriving (Functor, Show)
 
 $(deriveSafeCopy 0 'base ''Table)
-
--- | Creates empty RedBlackTree
-empty :: BinaryTreeNode a => RedBlackTree a
-empty = emptyRedBlackTree
 
 -- | Checks if shortened url is not empty
 shortUrlIsNil :: ShortUrl -> Bool

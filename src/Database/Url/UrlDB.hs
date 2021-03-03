@@ -7,13 +7,11 @@ module Database.Url.UrlDB
   , genUUID
   ) where
 
-import Data.Acid
 import Control.Monad.Except
+import Data.Acid
 import Relude hiding (find)
-import Relude.Unsafe (fromJust)
 
 import Database.Url.Url
-import Database.User.User
 import Database.User.UserDB
 import Database.Common
 import Database.State
@@ -22,29 +20,30 @@ import Database.State
 -- | Inserts `Url` in db
 insertUrl :: DB m => Url -> Username -> m ()
 insertUrl url uname = do
-  (userTable, urlTable) <- ask
+  (_, urlTable) <- ask
 
-  -- checks if url is not empty
+  -- check if url is not empty
   when (urlIsNil url) $ throwError EUrlNil
-  -- checks if user with such username does exist
-  user <- liftIO $ query userTable $ QueryUser' uname
-  unless (isJust user) $ throwError EUserNExist
   -- check if shortenend url exists
-  oldUrl <- liftIO $ query urlTable $ QueryUrl' $ short url
-  when (isJust oldUrl) $ throwError EUrlExist
+  urlExists <- isJust <$> queryUrl (short url)
+  when urlExists $ throwError EUrlExist
 
-  let u = fromJust user
-  liftIO $ update userTable $ UpdateUrlsUser' u $ short url
-  liftIO $ update urlTable  $ InsertUrl' url
+  updateUrlsUser uname $ short url
+  liftIO $ update urlTable $ InsertUrl' url
 
 -- | Deletes `Url` from db
 deleteUrl :: DB m => ShortUrl -> Username -> m ()
-deleteUrl shortUrl uname = do
-  (userTable, urlTable) <- ask
-  user <- fromMaybe (error $ show EUserNExist) <$> queryUser uname
+deleteUrl url uname = do
+  (_, urlTable) <- ask
 
-  liftIO $ update userTable $ DeleteUrlUser' user shortUrl
-  liftIO $ update urlTable  $ DeleteUrl' shortUrl
+  -- check if url is not empty
+  when (shortUrlIsNil url) $ throwError ESUrlNil
+  -- check if such url exists
+  urlExists <- isJust <$> queryUrl url
+  unless urlExists $ throwError EUrlNExist
+
+  deleteUrlUser uname url
+  liftIO $ update urlTable $ DeleteUrl' url
 
 -- | Searches for `OrigUrl` by given `ShortUrl`
 queryUrl :: DB m => ShortUrl -> m (Maybe OrigUrl)

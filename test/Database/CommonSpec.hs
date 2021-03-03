@@ -15,5 +15,3 @@ spec = do
     it "shortUrlIsNil non-empty url" do
       let got = shortUrlIsNil "https://lichess.org"
       got `shouldBe` False
-
-

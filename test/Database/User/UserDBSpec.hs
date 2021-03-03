@@ -4,6 +4,7 @@ module Database.User.UserDBSpec (spec) where
 import Data.Acid
 import Database.State
 import Database.Common
+import Database.Url.Url
 import Database.User.User
 import Database.User.UserDB
 import Database.Test.Aux
@@ -11,11 +12,9 @@ import Test.Hspec
 
 import Control.Exception
 import Control.Monad.Catch (MonadMask)
+import Data.Maybe (fromJust)
 import Relude hiding (empty)
 import Relude.Extra (bimapBoth)
-import Data.RedBlackTree
-import Database.Url.Url
-import Data.Maybe (fromJust)
 
 import System.IO.Temp
 import System.FilePath ((</>))
@@ -78,7 +77,7 @@ spec = do
           urls  = []
           url   = "https://github.com"
       let user     = User uname urls "SihekthsV"
-          expected = user{urls=url:urls}
+          expected = user{ urls=urls <> [url] }
 
       -- insert user, then update it and query for result
       resultIn <- right <$> run tables (insertUser user)
@@ -94,7 +93,7 @@ spec = do
           urls  = ["https://duckduckgo.com", "https://haskell.org"]
           url   = "https://github.com"
       let user     = User uname urls "SihekthsV"
-          expected = user{urls=url:urls}
+          expected = user{ urls=urls <> [url]}
 
       -- insert user, then update it and query for result
       resultIn <- right <$> run tables (insertUser user)
@@ -107,10 +106,7 @@ spec = do
 
     itdb "add url to User that doesn't exist fail" $ \tables -> do
         let uname = "nonExistingUser"
-            urls  = ["https://duckduckgo.com", "https://haskell.org"]
             url   = "https://github.com"
-        let user     = User uname urls "SihekthsV"
-            expected = user{urls=url:urls}
 
         -- try to update `User`
         got <- left =<< run tables (updateUrlsUser uname url)
@@ -120,10 +116,7 @@ spec = do
 
     itdb "add url to User with nil username fail" $ \tables -> do
         let uname = ""
-            urls  = ["https://duckduckgo.com", "https://haskell.org"]
             url   = "https://github.com"
-        let user     = User uname urls "SihekthsV"
-            expected = user{urls=url:urls}
 
         -- try to update `User`
         got <- left =<< run tables (updateUrlsUser uname url)
@@ -136,7 +129,6 @@ spec = do
             urls  = ["https://duckduckgo.com", "https://haskell.org"]
             url   = ""
         let user     = User uname urls "SihekthsV"
-            expected = user{urls=url:urls}
 
         -- insert a user, then try update it
         resultIn <- right =<< run tables (insertUser user)
@@ -149,7 +141,6 @@ spec = do
             urls  = ["https://duckduckgo.com", "https://haskell.org"]
             url   = "https://haskell.org"
         let user     = User uname urls "SihekthsV"
-            expected = user{urls=url:urls}
 
         -- insert a user, then try update it
         resultIn <- right =<< run tables (insertUser user)
@@ -271,4 +262,3 @@ spec = do
       resultIn <- right =<< run tables (insertUser user)
       got      <- left  =<< run tables (deleteUrlUser uname urlToDel)
       got `shouldBe` ESUrlNil
-
