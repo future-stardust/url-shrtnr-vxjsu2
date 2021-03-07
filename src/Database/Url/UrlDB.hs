@@ -17,7 +17,7 @@ import Database.Common
 import Database.State
 
 
--- | Inserts `Url` in db
+-- | Insert `Url` in db
 insertUrl :: DB m => Url -> Username -> m ()
 insertUrl url uname = do
   (_, urlTable) <- ask
@@ -31,7 +31,7 @@ insertUrl url uname = do
   updateUrlsUser uname $ short url
   liftIO $ update urlTable $ InsertUrl' url
 
--- | Deletes `Url` from db
+-- | Delete `Url` from db
 deleteUrl :: DB m => ShortUrl -> Username -> m ()
 deleteUrl url uname = do
   (_, urlTable) <- ask
@@ -45,13 +45,13 @@ deleteUrl url uname = do
   deleteUrlUser uname url
   liftIO $ update urlTable $ DeleteUrl' url
 
--- | Searches for `OrigUrl` by given `ShortUrl`
+-- | Search for `OrigUrl` by given `ShortUrl`
 queryUrl :: DB m => ShortUrl -> m (Maybe OrigUrl)
 queryUrl url = do
   (_, urlTable) <- ask
   liftIO $ query urlTable $ QueryUrl' url
 
--- | Generates new `UUID`
+-- | Generate new `UUID`
 genUUID :: DB m => m UUID
 genUUID = do
   (_, urlTable) <- ask

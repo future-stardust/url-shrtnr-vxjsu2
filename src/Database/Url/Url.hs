@@ -2,6 +2,8 @@
 {-# LANGUAGE ViewPatterns          #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE InstanceSigs #-}
 module Database.Url.Url
   ( Url(..)
   , UrlTable
@@ -24,7 +26,8 @@ import           Data.SafeCopy
 import           Relude
 
 import           Database.Common
-import qualified Database.Tree.Tree as BT
+import qualified Database.Tree.Tree as T
+import qualified Data.BTree.Pure as B
 
 -- | Url representation in database
 data Url = Url
@@ -33,13 +36,31 @@ data Url = Url
   } deriving (Eq, Show)
 
 -- | Tree for url table
-type TreeUrl  = BT.Tree ShortUrl Url
+type TreeUrl  = T.Tree ShortUrl Url
+
+-- data Table b where
+--   Table :: (T.Treeable a, T.Treeable b) => (a -> b) -> a -> UUID -> Table (b, UUID)
+
+-- instance Functor Table where
+--   fmap f (Table g a b) = Table (f . g) a b
 
 -- | UrlTable of urls tree and id
 type UrlTable = Table (TreeUrl, UUID)
 
-instance BT.HasIndex Url ShortUrl where
+instance T.HasIndex Url where
+  type Index Url = ShortUrl
   getIndex = short
+
+-- instance T.Treeable (B.Tree ShortUrl Url) where
+--   type Elem (B.Tree ShortUrl Url) = Url
+--   empty'          = B.empty B.twoThreeSetup
+--   singleton' el   = B.singleton B.twoThreeSetup (T.getIndex el) el
+--   insert' el tree = B.insert (T.getIndex el) el tree
+--   lookup' k  tree = B.lookup k tree
+--   delete' k  tree = B.delete k tree
+--   toList'    tree = B.toList tree <&> snd
+--   fromList'  el   = B.fromList B.twoThreeSetup $ (\x -> (T.getIndex x, x)) <$> el
+
 
 instance SafeCopy Url where
   putCopy Url{..} = contain $ safePut orig
@@ -47,23 +68,22 @@ instance SafeCopy Url where
   getCopy = contain $ Url <$> safeGet <*> safeGet
 
 instance SafeCopy TreeUrl where
-  putCopy (BT.toList -> list) = contain $ safePut list
-  getCopy = contain $ BT.fromList <$> safeGet
-
+  putCopy (T.toList -> list) = contain $ safePut list
+  getCopy = contain $ T.fromList <$> safeGet
 
 -- | Inserts `Url` in db
 insertUrl' :: Url -> Update UrlTable ()
-insertUrl' = modify . (<$>) . first . BT.insert
+insertUrl' = modify . (<$>) . first . T.insert
 
 -- | Searches for `OrigUrl` by given `ShortUrl`
 queryUrl' :: ShortUrl -> Query UrlTable (Maybe OrigUrl)
 queryUrl' url = do
   Table (tree, _) <- ask
-  return $ orig <$> BT.lookup url tree
+  return $ orig <$> T.lookup url tree
 
 -- | Deletes `Url` by given `ShortUrl`
 deleteUrl' :: ShortUrl -> Update UrlTable ()
-deleteUrl' =  modify . (<$>) . first . BT.delete
+deleteUrl' =  modify . (<$>) . first . T.delete
 
 -- | Adds +1 to `UUID`
 updateUUID' :: Update UrlTable ()
@@ -78,7 +98,6 @@ queryUUID' = do
 
 $(makeAcidic ''UrlTable  ['insertUrl', 'queryUrl', 'deleteUrl', 'updateUUID', 'queryUUID'])
 
---------- AUXILIARY FUNCTIONS ---------
 
 -- | Checks if any of `Url` fields is nil
 urlIsNil :: Url -> Bool

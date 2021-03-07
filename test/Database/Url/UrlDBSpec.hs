@@ -5,6 +5,7 @@ import Relude.Unsafe (fromJust)
 import Test.Hspec
 
 import Database.Test.Aux
+import Database.Database hiding (deleteUrl, genUUID)
 import Database.Common
 import Database.Url.Url
 import Database.Url.UrlDB
@@ -20,12 +21,13 @@ spec = do
           shortUrl = "https://localhost/r/abc"
           url = Url "https://bartoszmilewski.com" shortUrl
           expected = orig url
+
       -- insert user, url, and then query it
-      resU  <- right =<< run tables (insertUser user)
-      resIn <- right =<< run tables (insertUrl url uname)
-      resQ  <- right <$> run tables (queryUrl shortUrl)
+      _   <- right =<< runDB tables (insertUser user)
+      _   <- right =<< runDB tables (insertUrl url uname)
+      res <- right <$> runDB tables (queryUrl shortUrl)
       -- should return original url
-      got   <- fromJust <$> resQ
+      got   <- fromJust <$> res
       got `shouldBe` expected
 
 
@@ -34,10 +36,10 @@ spec = do
           user = User uname [] "IEktv8j$nk2;3U"
           shortUrl = ""
           url = Url "" shortUrl
-          expected = orig url
+
       -- insert user, url, and then query it
-      resI <- right =<< run tables (insertUser user)
-      got  <- left  =<< run tables (insertUrl url uname)
+      _   <- right =<< runDB tables (insertUser user)
+      got <- left  =<< runDB tables (insertUrl url uname)
       -- should return original url
       got `shouldBe` EUrlNil
 
@@ -45,14 +47,12 @@ spec = do
     itdb "insert url with nil orig url fail" $ \tables -> do
       let uname = "curry909"
           user = User uname [] "IEktv8j$nk2;3U"
-          -- shortUrl = "https://ro-che.info/ccc/10"
           shortUrl = "https://localhost/r/b5g4"
           url = Url "" shortUrl
-          expected = orig url
 
       -- insert user and url
-      resI <- right =<< run tables (insertUser user)
-      got  <- left  =<< run tables (insertUrl url uname)
+      _   <- right =<< runDB tables (insertUser user)
+      got <- left  =<< runDB tables (insertUrl url uname)
       got `shouldBe` EUrlNil
 
 
@@ -61,21 +61,19 @@ spec = do
           user = User uname [] "IEktv8j$nk2;3U"
           shortUrl = ""
           url = Url "https://ro-che.info/ccc/27" shortUrl
-          expected = orig url
 
       -- insert user and url
-      resI <- right =<< run tables (insertUser user)
-      got  <- left  =<< run tables (insertUrl url uname)
+      _   <- right =<< runDB tables (insertUser user)
+      got <- left  =<< runDB tables (insertUrl url uname)
       got `shouldBe` EUrlNil
 
 
     itdb "insert url with non-existing user fail" $ \tables -> do
       let shortUrl = "https://localhost/r/tenr"
           url = Url "https://ro-che.info/ccc/27" shortUrl
-          expected = orig url
 
       -- insert without inserting user
-      got  <- left  =<< run tables (insertUrl url "none")
+      got  <- left  =<< runDB tables (insertUrl url "none")
       got `shouldBe` EUserNExist
 
 
@@ -84,14 +82,13 @@ spec = do
           user = User uname [] "IEktv8j$nk2;3U"
           shortUrl = "https://localhost/r/OEl"
           url = Url "https://haskell.org" shortUrl
-          expected = orig url
 
       -- insert user, url, make sure it exists
       -- then try to insert it again
-      resU  <- right =<< run tables (insertUser user)
-      resIn <- right =<< run tables (insertUrl url uname)
-      resQ  <- right =<< run tables (queryUrl shortUrl)
-      got   <- left  =<< run tables (insertUrl url uname)
+      _   <- right =<< runDB tables (insertUser user)
+      _   <- right =<< runDB tables (insertUrl url uname)
+      _   <- right =<< runDB tables (queryUrl shortUrl)
+      got <- left  =<< runDB tables (insertUrl url uname)
 
       got `shouldBe` EUrlExist
 
@@ -106,11 +103,11 @@ spec = do
           expected = orig url
 
       -- insert user, url and then try query it
-      resU  <- right =<< run tables (insertUser user)
-      resIn <- right =<< run tables (insertUrl url uname)
-      resQ  <- right <$> run tables (queryUrl shortUrl)
+      _   <- right =<< runDB tables (insertUser user)
+      _   <- right =<< runDB tables (insertUrl url uname)
+      res <- right <$> runDB tables (queryUrl shortUrl)
       -- should return original url
-      got <- fromJust <$> resQ
+      got <- fromJust <$> res
       got `shouldBe` expected
 
 
@@ -118,7 +115,7 @@ spec = do
       let shortUrl = "https://localhost/r/1Tlk7"
 
       -- try to query non-existing url
-      got <- right =<< run tables (queryUrl shortUrl)
+      got <- right =<< runDB tables (queryUrl shortUrl)
       got `shouldBe` Nothing
 
 
@@ -130,12 +127,12 @@ spec = do
           url = Url "https://haskell.org" shortUrl
 
       -- insert user, url and query it
-      resU  <- right =<< run tables (insertUser user)
-      resIn <- right =<< run tables (insertUrl url uname)
-      resQ  <- right =<< run tables (queryUrl shortUrl)
+      _   <- right =<< runDB tables (insertUser user)
+      _   <- right =<< runDB tables (insertUrl url uname)
+      _   <- right =<< runDB tables (queryUrl shortUrl)
       -- delete url and make sure it's gone
-      resD  <- right =<< run tables (deleteUrl shortUrl uname)
-      got   <- right =<< run tables (queryUrl shortUrl)
+      _   <- right =<< runDB tables (deleteUrl shortUrl uname)
+      got <- right =<< runDB tables (queryUrl shortUrl)
 
       got `shouldBe` Nothing
 
@@ -146,8 +143,8 @@ spec = do
           shortUrl = "https://localhost/r/nonexisting"
 
       -- insert user, and try to delete url
-      resU <- right =<< run tables (insertUser user)
-      got  <- left  =<< run tables (deleteUrl shortUrl uname)
+      _   <- right =<< runDB tables (insertUser user)
+      got <- left  =<< runDB tables (deleteUrl shortUrl uname)
 
       got `shouldBe` EUrlNExist
 
@@ -157,7 +154,7 @@ spec = do
           shortUrl = ""
 
       -- try to delete url
-      got <- left  =<< run tables (deleteUrl shortUrl uname)
+      got <- left  =<< runDB tables (deleteUrl shortUrl uname)
       got `shouldBe` ESUrlNil
 
 
@@ -169,10 +166,10 @@ spec = do
           url = Url "https://golem.ph.utexas.edu" shortUrl
 
       -- insert user and url
-      resU <- right =<< run tables (insertUser user)
-      resI <- right =<< run tables (insertUrl url uname)
+      _   <- right =<< runDB tables (insertUser user)
+      _   <- right =<< runDB tables (insertUrl url uname)
       -- try to delete existing url, but from another user
-      got  <- left  =<< run tables (deleteUrl shortUrl unameNExist)
+      got <- left  =<< runDB tables (deleteUrl shortUrl unameNExist)
       got `shouldBe` EUserNExist
 
 
@@ -180,8 +177,8 @@ spec = do
   describe "uuid actions" do
     itdb "update uuid" $ \tables -> do
       -- generate uuid
-      expected <- right =<< run tables genUUID
+      expected <- right =<< runDB tables genUUID
       -- generate uuid once more
-      got      <- right =<< run tables genUUID
+      got      <- right =<< runDB tables genUUID
       -- the result should be 1 more than the previous one
       got `shouldBe` (expected + 1)

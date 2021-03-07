@@ -5,7 +5,6 @@ import Data.Serialize
 import Relude
 import Test.Hspec
 
-import           Database.Common
 import qualified Database.Tree.Tree as BT
 import           Database.Url.Url
 

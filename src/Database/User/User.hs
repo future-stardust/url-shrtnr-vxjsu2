@@ -30,16 +30,14 @@ data User = User
   { username :: Username   -- ^ user's username -- Unique
   , urls     :: [ShortUrl] -- ^ shortened url created by user
   , hash     :: Hash       -- ^ password hash
-  } deriving (Show)
+  } deriving (Eq, Show)
 
 -- | Tree for user table
 type TreeUser  = BT.Tree Username User
 type UserTable = Table TreeUser
 
-instance Eq User where
-  (==) (User u1 _ _) (User u2 _ _) = u1 == u2
-
-instance BT.HasIndex User Username where
+instance BT.HasIndex User where
+  type Index User = Username
   getIndex = username
 
 instance SafeCopy User where

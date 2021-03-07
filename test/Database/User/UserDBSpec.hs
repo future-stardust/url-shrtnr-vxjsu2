@@ -1,23 +1,15 @@
 module Database.User.UserDBSpec (spec) where
 
 
-import Data.Acid
-import Database.State
 import Database.Common
-import Database.Url.Url
 import Database.User.User
 import Database.User.UserDB
+import Database.Database hiding (deleteUrl, genUUID)
 import Database.Test.Aux
-import Test.Hspec
 
-import Control.Exception
-import Control.Monad.Catch (MonadMask)
 import Data.Maybe (fromJust)
 import Relude hiding (empty)
-import Relude.Extra (bimapBoth)
-
-import System.IO.Temp
-import System.FilePath ((</>))
+import Test.Hspec
 
 
 spec :: Spec
@@ -27,18 +19,17 @@ spec = do
       let expected = User "William" [] "SEoinXKenoi@5!@'a"
 
       -- insert user and check that there's no error (matches Right)
-      right =<< run tables (insertUser expected)
+      _   <- right =<< runDB tables (insertUser expected)
       -- and then query it
-      result <- right    <$> run tables (queryUser "William")
-      got    <- fromJust <$> result
-
+      res <- right <$> runDB tables (queryUser "William")
+      got <- fromJust <$> res
       got `shouldBe` expected
 
 
     itdb "zero values username and hash in User fail" $ \tables -> do
       let user = User "" [] ""
       -- try to insert user
-      got <- left =<< run tables (insertUser user)
+      got <- left =<< runDB tables (insertUser user)
       -- should return an exception
       got `shouldBe` EUserNil
 
@@ -46,7 +37,7 @@ spec = do
     itdb "zero value username fail" $ \tables -> do
       let user = User "" [] "ioUBknil.t42#tKL"
       -- try to insert user
-      got <- left =<< run tables (insertUser user)
+      got <- left =<< runDB tables (insertUser user)
       -- should return an exception
       got `shouldBe` EUserNil
 
@@ -54,7 +45,7 @@ spec = do
     itdb "zero value hash fail" $ \tables -> do
       let user = User "notnil9" [] ""
       -- try to insert user
-      got <- left =<< run tables (insertUser user)
+      got <- left =<< runDB tables (insertUser user)
       -- should return an exception
       got `shouldBe` EUserNil
 
@@ -62,11 +53,11 @@ spec = do
     itdb "username exists fail" $ \tables -> do
       let user1 = User "Bob15" [] "Sihoten5$%e"
           user2 = User "Bob15" [] "iEOsihths%#$@^sht"
+
       -- try to insert users one after the other
-      result1 <- run tables $ insertUser user1
-      result2 <- run tables $ insertUser user2
+      _   <- right =<< runDB tables (insertUser user1)
+      got <- left  =<< runDB tables (insertUser user2)
       -- should return an exception
-      got     <- left result2
       got `shouldBe` EUserExist
 
 
@@ -80,12 +71,12 @@ spec = do
           expected = user{ urls=urls <> [url] }
 
       -- insert user, then update it and query for result
-      resultIn <- right <$> run tables (insertUser user)
-      resultUp <- right <$> run tables (updateUrlsUser uname url)
-      res      <- right <$> run tables (queryUser uname)
+      _   <- right <$> runDB tables (insertUser user)
+      _   <- right <$> runDB tables (updateUrlsUser uname url)
+      res <- right <$> runDB tables (queryUser uname)
       -- should return user with a new url
       got <- fromJust <$> res
-      got `cmp` expected `shouldBe` True
+      got `shouldBe` expected
 
 
     itdb "add url to User's list of urls" $ \tables -> do
@@ -96,12 +87,12 @@ spec = do
           expected = user{ urls=urls <> [url]}
 
       -- insert user, then update it and query for result
-      resultIn <- right <$> run tables (insertUser user)
-      resultUp <- right <$> run tables (updateUrlsUser uname url)
-      res      <- right <$> run tables (queryUser uname)
+      _   <- right <$> runDB tables (insertUser user)
+      _   <- right <$> runDB tables (updateUrlsUser uname url)
+      res <- right <$> runDB tables (queryUser uname)
       -- should return user with a new url
       got <- fromJust <$> res
-      got `cmp` expected `shouldBe` True
+      got `shouldBe` expected
 
 
     itdb "add url to User that doesn't exist fail" $ \tables -> do
@@ -109,7 +100,7 @@ spec = do
             url   = "https://github.com"
 
         -- try to update `User`
-        got <- left =<< run tables (updateUrlsUser uname url)
+        got <- left =<< runDB tables (updateUrlsUser uname url)
         -- should return user with a new url
         got `shouldBe` EUserNExist
 
@@ -119,7 +110,7 @@ spec = do
             url   = "https://github.com"
 
         -- try to update `User`
-        got <- left =<< run tables (updateUrlsUser uname url)
+        got <- left =<< runDB tables (updateUrlsUser uname url)
         -- should return user with a new url
         got `shouldBe` EUserNExist
 
@@ -131,8 +122,8 @@ spec = do
         let user     = User uname urls "SihekthsV"
 
         -- insert a user, then try update it
-        resultIn <- right =<< run tables (insertUser user)
-        got      <- left  =<< run tables (updateUrlsUser uname url)
+        _   <- right =<< runDB tables (insertUser user)
+        got <- left  =<< runDB tables (updateUrlsUser uname url)
         got `shouldBe` ESUrlNil
 
 
@@ -143,8 +134,8 @@ spec = do
         let user     = User uname urls "SihekthsV"
 
         -- insert a user, then try update it
-        resultIn <- right =<< run tables (insertUser user)
-        got      <- left  =<< run tables (updateUrlsUser uname url)
+        _   <- right =<< runDB tables (insertUser user)
+        got <- left  =<< runDB tables (updateUrlsUser uname url)
         got `shouldBe` ESUrlExist
 
 
@@ -156,22 +147,22 @@ spec = do
           expected = user
 
       -- insert a user, then try to query it
-      resultIn <- right =<< run tables (insertUser user)
-      result   <- right <$> run tables (queryUser uname)
+      _   <- right =<< runDB tables (insertUser user)
+      res <- right <$> runDB tables (queryUser uname)
       -- should return the same user
-      got <- fromJust <$> result
+      got <- fromJust <$> res
       got `shouldBe` expected
 
 
     itdb "query user which doesn't exist fail" $ \tables -> do
       -- try to query user which doesn't exist in db
-      got <- right =<< run tables (queryUser "nonexistinguser")
+      got <- right =<< runDB tables (queryUser "nonexistinguser")
       got `shouldBe` Nothing
 
 
     itdb "query user with nil username fail" $ \tables -> do
       -- try to query user which doesn't exist in db
-      got <- right =<< run tables (queryUser "")
+      got <- right =<< runDB tables (queryUser "")
       got `shouldBe` Nothing
 
 
@@ -185,10 +176,10 @@ spec = do
           expected = urls
 
       -- insert a user, then try to query his urls
-      resultIn <- right =<< run tables (insertUser user)
-      result   <- right <$> run tables (queryUserUrls uname)
+      _   <- right =<< runDB tables (insertUser user)
+      res <- right <$> runDB tables (queryUserUrls uname)
       -- should return the same urls
-      got <- fromJust <$> result
+      got <- fromJust <$> res
       got `shouldBe` expected
 
 
@@ -199,22 +190,22 @@ spec = do
           expected = urls
 
       -- insert a user, then try to query his urls
-      resultIn <- right =<< run tables (insertUser user)
-      result   <- right <$> run tables (queryUserUrls uname)
+      _   <- right =<< runDB tables (insertUser user)
+      res <- right <$> runDB tables (queryUserUrls uname)
       -- should return the same urls
-      got <- fromJust <$> result
+      got <- fromJust <$> res
       got `shouldBe` expected
 
 
     itdb "query urls with user which doesn't exist fail" $ \tables -> do
       -- try to query urls with user which doesn't exist in db
-      got <- right =<< run tables (queryUser "nonexistinguser")
+      got <- right =<< runDB tables (queryUser "nonexistinguser")
       got `shouldBe` Nothing
 
 
     itdb "query urls with user with nil username fail" $ \tables -> do
       -- try to query urls with user which doesn't exist in db
-      got <- right =<< run tables (queryUser "")
+      got <- right =<< runDB tables (queryUser "")
       got `shouldBe` Nothing
 
 
@@ -228,17 +219,17 @@ spec = do
           expected = filter (/= urlToDel) urls
 
       -- insert a user, delete one of urls, then try to query his urls
-      resultIn  <- right =<< run tables (insertUser user)
-      resultDel <- right =<< run tables (deleteUrlUser uname urlToDel)
-      result    <- right <$> run tables (queryUserUrls uname)
+      _   <- right =<< runDB tables (insertUser user)
+      _   <- right =<< runDB tables (deleteUrlUser uname urlToDel)
+      res <- right <$> runDB tables (queryUserUrls uname)
       -- should return the same user, but without certain url
-      got <- fromJust <$> result
+      got <- fromJust <$> res
       got `shouldBe` expected
 
     itdb "delete url from non-existing user fail" $ \tables -> do
       let url = "https://godbolt.org"
       -- try to delete one of user's urls
-      got <- left =<< run tables (deleteUrlUser "none" url)
+      got <- left =<< runDB tables (deleteUrlUser "none" url)
       got `shouldBe` EUserNExist
 
     itdb "delete non-existing url fail" $ \tables -> do
@@ -248,8 +239,8 @@ spec = do
           user  = User uname urls "1oTi^Ip%uelkoIUbkv%#"
 
       -- insert a user, delete one of urls, then try to query his urls
-      resultIn <- right =<< run tables (insertUser user)
-      got      <- left  =<< run tables (deleteUrlUser uname urlToDel)
+      _   <- right =<< runDB tables (insertUser user)
+      got <- left  =<< runDB tables (deleteUrlUser uname urlToDel)
       got `shouldBe` ESUrlNExist
 
     itdb "delete nil-value url fail" $ \tables -> do
@@ -259,6 +250,6 @@ spec = do
           user  = User uname urls "1oTi^Ip%uelkoIUbkv%#"
 
       -- insert a user, delete one of urls, then try to query his urls
-      resultIn <- right =<< run tables (insertUser user)
-      got      <- left  =<< run tables (deleteUrlUser uname urlToDel)
+      _   <- right =<< runDB tables (insertUser user)
+      got <- left  =<< runDB tables (deleteUrlUser uname urlToDel)
       got `shouldBe` ESUrlNil

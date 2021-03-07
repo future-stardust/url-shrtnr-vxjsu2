@@ -5,7 +5,6 @@ import Data.Serialize
 import Relude
 import Test.Hspec
 
-import           Database.Common
 import qualified Database.Tree.Tree as BT
 import           Database.User.User
 
@@ -14,7 +13,7 @@ spec = do
   describe "Eq User" do
     it "==" do
       let user1 = User "user" [] "thYJfub$*8"
-          user2 = User "user" [] "tehkhtl"
+          user2 = User "user" [] "thYJfub$*8"
       user1 `shouldBe` user2
 
     it "/=" do
