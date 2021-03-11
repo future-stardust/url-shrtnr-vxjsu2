@@ -1,0 +1,3 @@
+[submodule "url-shortener-specification"]
+	path = url-shortener-specification
+	url = https://github.com/future-stardust/url-shortener-specification

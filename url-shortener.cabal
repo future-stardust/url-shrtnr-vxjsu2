@@ -1,0 +1,131 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.34.4.
+--
+-- see: https://github.com/sol/hpack
+
+name:           url-shortener
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/future-stardust/url-shrtnr-vxjsu2/blob/main/README.md>
+homepage:       https://github.com/github.com/future-stardust#readme
+bug-reports:    https://github.com/github.com/future-stardust/issues
+author:         Alexander, Yaroslav
+maintainer:     Alexander, Yaroslav
+copyright:      2021 Alexander, Yaroslav
+license:        GPL-3
+build-type:     Simple
+extra-source-files:
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/github.com/future-stardust
+  subdir: url-shrtnr-vxjsu2
+
+library
+  exposed-modules:
+      Database.Common
+      Database.Database
+      Database.State
+      Database.Tree.Tree
+      Database.Url.Url
+      Database.Url.UrlDB
+      Database.User.User
+      Database.User.UserDB
+  other-modules:
+      Paths_url_shortener
+  hs-source-dirs:
+      src
+  default-extensions:
+      BlockArguments
+      FlexibleContexts
+      FlexibleInstances
+      GeneralizedNewtypeDeriving
+      GADTs
+      NoImplicitPrelude
+      OverloadedStrings
+      RecordWildCards
+      StrictData
+      TypeFamilies
+  ghc-options: -O3 -fwrite-ide-info -hiedir=.hie -Wall
+  build-depends:
+      acid-state ==0.16.*
+    , base >=4.7 && <5
+    , filepath ==1.4.*
+    , haskey-btree ==0.3.*
+    , mtl ==2.2.*
+    , relude ==0.7.*
+    , safecopy ==0.10.*
+    , text ==1.2.*
+  default-language: Haskell2010
+
+executable shortener
+  main-is: Main.hs
+  other-modules:
+      Paths_url_shortener
+  hs-source-dirs:
+      app
+  default-extensions:
+      BlockArguments
+      FlexibleContexts
+      FlexibleInstances
+      GeneralizedNewtypeDeriving
+      GADTs
+      NoImplicitPrelude
+      OverloadedStrings
+      RecordWildCards
+      StrictData
+      TypeFamilies
+  ghc-options: -O3 -fwrite-ide-info -hiedir=.hie -threaded -rtsopts -with-rtsopts=-N -Wall
+  build-depends:
+      acid-state ==0.16.*
+    , base >=4.7 && <5
+    , filepath ==1.4.*
+    , haskey-btree ==0.3.*
+    , mtl ==2.2.*
+    , relude ==0.7.*
+    , safecopy ==0.10.*
+    , text ==1.2.*
+    , url-shortener
+  default-language: Haskell2010
+
+test-suite db-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Database.CommonSpec
+      Database.Test.Aux
+      Database.Url.UrlDBSpec
+      Database.Url.UrlSpec
+      Database.User.UserDBSpec
+      Database.User.UserSpec
+      Paths_url_shortener
+  hs-source-dirs:
+      test
+  default-extensions:
+      BlockArguments
+      FlexibleContexts
+      FlexibleInstances
+      GeneralizedNewtypeDeriving
+      GADTs
+      NoImplicitPrelude
+      OverloadedStrings
+      RecordWildCards
+      StrictData
+      TypeFamilies
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
+  build-depends:
+      acid-state ==0.16.*
+    , base >=4.7 && <5
+    , cereal ==0.5.*
+    , exceptions ==0.10.*
+    , filepath ==1.4.*
+    , haskey-btree ==0.3.*
+    , hspec ==2.7.*
+    , mtl ==2.2.*
+    , relude ==0.7.*
+    , safecopy ==0.10.*
+    , temporary ==1.3.*
+    , text ==1.2.*
+    , url-shortener
+  default-language: Haskell2010
