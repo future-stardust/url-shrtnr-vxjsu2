@@ -1,5 +1,21 @@
 module Database.Database
-  ( createUser
+  ( UUID
+  , Username
+  , Hash
+  , OrigUrl
+  , ShortUrl
+  , DBError(..)
+  , Table (..)
+  , Url(..)
+  , UrlTable
+  , TreeUrl
+  , User(..)
+  , UserTable
+  , TreeUser
+  , Tables
+  , DB
+  , AppDB (..)
+  , createUser
   , getUser
   , getUserUrls
   , createUrl
