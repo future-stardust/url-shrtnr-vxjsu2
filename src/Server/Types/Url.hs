@@ -9,11 +9,11 @@ import           Data.Aeson.Deriving
 import           GHC.Generics
 import           Server.Types.Util
 
-import Relude
+import           Relude
 
 -- | Internal type used in "urls/" route. Represents url.
 data Url = Url
-  { uUrl           :: Text -- ^ Original url
+  { uUrl          :: Text -- ^ Original url
   , uAlias        :: Text -- ^ Alias for url
   , uShortenedUrl :: Text -- ^ Shortened url
   }

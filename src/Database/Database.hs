@@ -55,7 +55,7 @@ openDB dir = do
 
 -- | Close db state
 closeDB :: Tables -> IO ()
-closeDB = (<*>) ((>>) . closeAcidState . fst) (closeAcidState . snd)
+closeDB = (>>) . closeAcidState . fst <*> closeAcidState . snd
 
 -- | Run db monad
 runDB :: Tables -> AppDB a -> IO (Either DBError a)

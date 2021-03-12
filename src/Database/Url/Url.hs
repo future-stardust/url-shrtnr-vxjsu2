@@ -27,7 +27,6 @@ import           Relude
 
 import           Database.Common
 import qualified Database.Tree.Tree as T
-import qualified Data.BTree.Pure as B
 
 -- | Url representation in database
 data Url = Url

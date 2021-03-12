@@ -19,7 +19,6 @@ module Database.Common
   ) where
 
 import Data.SafeCopy
-import qualified Data.Text as T
 import Relude hiding (empty, find)
 import qualified Text.Show
 
@@ -29,13 +28,13 @@ type UUID     = Int
 -- TODO: use NonEmpty for `Username`, `OrigUrl`
 -- and `ShortUrl` instead (?)
 -- | `User`'s username
-type Username = T.Text
+type Username = Text
 -- | `User`'s hashed password
-type Hash     = T.Text
+type Hash     = Text
 -- | Original url
-type OrigUrl  = T.Text
+type OrigUrl  = Text
 -- | Shortened url
-type ShortUrl = T.Text
+type ShortUrl = Text
 
 
 -- | Database error

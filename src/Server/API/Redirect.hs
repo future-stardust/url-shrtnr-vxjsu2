@@ -6,7 +6,7 @@ module Server.API.Redirect
   )
 where
 
-import           Data.Text   (Text)
+import           Relude
 import           Servant.API
 
-type Redirect = "r" :> Capture "alias" Text :> Get '[] NoContent
+type Redirect = "r" :> Capture "alias" Text :> Get '[JSON] NoContent

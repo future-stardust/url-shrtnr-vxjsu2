@@ -32,9 +32,12 @@ dependencies:
 
 # API
 - servant
+- servant-server
+- servant-flatten
 - aeson
 - aeson-deriving
-- servant-flatten
+- cookie
+- wai
 
 # Util
 - mtl

@@ -10,11 +10,12 @@ import           Data.Text    (Text)
 import           Servant.API
 import           Server.Types
 
-type Shorten = "urls" :> "shorten" :> ReqBody '[JSON] ShortenReqBody :> Post '[JSON] ShortenedUrl
+type Shorten = "urls" :> "shorten" :> ReqBody '[JSON] ShortenReqBody :>
+  Header "Cookie" Token :> Post '[JSON] ShortenedUrl
 
-type ListUrls = "urls" :> Get '[JSON] [Url]
+type ListUrls = "urls" :> Header "Cookie" Token :> Get '[JSON] [Url]
 
-type DeleteUrl = "urls" :> Capture "alias" Text :> Delete '[] NoContent
+type DeleteUrl = "urls" :> Capture "alias" Text :> Header "Cookie" Token :> Delete '[JSON] NoContent
 
 
 type Urls = Shorten :<|> ListUrls :<|> DeleteUrl

@@ -9,7 +9,7 @@ import           Data.Aeson.Deriving
 import           GHC.Generics
 import           Server.Types.Util
 
-import Relude
+import           Relude
 
 -- | Internal type used in "urls/" route. Represents shortened url.
 data ShortenedUrl = ShortenedUrl
