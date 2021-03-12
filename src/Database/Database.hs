@@ -19,6 +19,7 @@ module Database.Database
   , getUser
   , getUserUrls
   , createUrl
+  , Database.Database.queryUrl
   , Database.Database.deleteUrl
   , Database.Database.genUUID
   , openDB
@@ -53,6 +54,10 @@ getUserUrls = queryUserUrls
 -- | Insert `Url` in db
 createUrl :: DB m => Url -> Username -> m ()
 createUrl = insertUrl
+
+-- | Query `OrigUrl` by `ShortUrl`
+queryUrl :: DB m => ShortUrl -> m (Maybe OrigUrl)
+queryUrl = Database.Url.UrlDB.queryUrl
 
 -- | Delete `Url` from db
 deleteUrl :: DB m => ShortUrl -> Username -> m ()
