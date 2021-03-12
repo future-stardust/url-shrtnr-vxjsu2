@@ -75,13 +75,13 @@ library
     , cookie
     , filepath ==1.4.*
     , haskey-btree ==0.3.*
-    , mtl
+    , mtl ==2.2.*
     , relude ==0.7.*
     , safecopy ==0.10.*
     , servant
     , servant-flatten
     , servant-server
-    , text
+    , text ==1.2.*
     , wai
   default-language: Haskell2010
 
@@ -111,13 +111,13 @@ executable shortener
     , cookie
     , filepath ==1.4.*
     , haskey-btree ==0.3.*
-    , mtl
+    , mtl ==2.2.*
     , relude ==0.7.*
     , safecopy ==0.10.*
     , servant
     , servant-flatten
     , servant-server
-    , text
+    , text ==1.2.*
     , url-shortener
     , wai
   default-language: Haskell2010
@@ -158,14 +158,14 @@ test-suite db-test
     , filepath ==1.4.*
     , haskey-btree ==0.3.*
     , hspec ==2.7.*
-    , mtl
+    , mtl ==2.2.*
     , relude ==0.7.*
     , safecopy ==0.10.*
     , servant
     , servant-flatten
     , servant-server
     , temporary ==1.3.*
-    , text
+    , text ==1.2.*
     , url-shortener
     , wai
   default-language: Haskell2010

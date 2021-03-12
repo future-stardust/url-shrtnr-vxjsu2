@@ -8,5 +8,6 @@ where
 
 import           Relude
 import           Servant.API
+import           Server.Types
 
-type Redirect = "r" :> Capture "alias" Text :> Get '[JSON] NoContent
+type Redirect = "r" :> Capture "alias" Text :> Header "Cookie" Token :> Get '[JSON] NoContent

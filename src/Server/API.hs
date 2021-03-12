@@ -18,4 +18,3 @@ type API = Users :<|> Urls :<|> Redirect
 
 api :: Proxy API
 api = Proxy
-

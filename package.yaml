@@ -39,10 +39,6 @@ dependencies:
 - cookie
 - wai
 
-# Util
-- mtl
-- text
-
 default-extensions:
   - BlockArguments
   - FlexibleContexts

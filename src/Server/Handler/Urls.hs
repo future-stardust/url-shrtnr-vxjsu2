@@ -16,13 +16,15 @@ import           Servant
 import           Server.Types.Util  (dbToServerError)
 
 shortenH :: ShortenReqBody -> Maybe Token -> HandlerT ShortenedUrl
-shortenH _                  Nothing  = throwError 404 { errBody = "Cookie is missing" }
+shortenH _                  Nothing  = throwError err404 { errBody = "Cookie is missing" }
 shortenH ShortenReqBody{..} (Just t) = do
   let d = tokenToData t
   name <- case d of
             Just (n, _) -> return n
-            Nothing -> throwError err500 { errBody = "Can't decode cookies" }
+            Nothing     -> throwError err500 { errBody = "Can't decode cookies" }
+
   tbs <- asks tables
+
   shUrl <- case srbAlias of
              Just al -> return al
              Nothing -> do
@@ -68,4 +70,15 @@ listUrlsH (Just t) = do
 deleteUrlH :: Text -> Maybe Token -> HandlerT NoContent
 deleteUrlH _     Nothing  = throwError err401
 deleteUrlH alias (Just t) = do
-  return NoContent
+  let d = tokenToData t
+  name <- case d of
+            Just (n, _) -> return n
+            Nothing -> throwError err500 { errBody = "Can't decode cookies" }
+
+  tbs <- asks tables
+
+  res <- liftIO . runDB tbs $ deleteUrl alias name
+
+  case res of
+    Right () -> return NoContent
+    Left  e  -> throwError $ dbToServerError e
