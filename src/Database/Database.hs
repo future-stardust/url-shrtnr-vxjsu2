@@ -1,5 +1,21 @@
 module Database.Database
-  ( createUser
+  ( UUID
+  , Username
+  , Hash
+  , OrigUrl
+  , ShortUrl
+  , DBError(..)
+  , Table (..)
+  , Url(..)
+  , UrlTable
+  , TreeUrl
+  , User(..)
+  , UserTable
+  , TreeUser
+  , Tables
+  , DB
+  , AppDB (..)
+  , createUser
   , getUser
   , getUserUrls
   , createUrl
@@ -46,7 +62,7 @@ deleteUrl = Database.Url.UrlDB.deleteUrl
 genUUID :: DB m => m UUID
 genUUID = Database.Url.UrlDB.genUUID
 
--- | Open db state in given dir
+-- | Open db state in given dir, if directory doesn't exist, it will be created
 openDB :: FilePath -> IO Tables
 openDB dir = do
   userTable <- openLocalStateFrom (dir </> "userTable") (Table BT.empty      :: UserTable)
