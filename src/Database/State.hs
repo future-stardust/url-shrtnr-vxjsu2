@@ -8,11 +8,12 @@ module Database.State
 
 import Control.Monad.Except
 import Data.Acid
+import Relude
+
 import Database.Common
 import Database.Url.Url
 import Database.User.User
 
-import Relude
 
 -- | Logical separation of different data structs in db
 type Tables = (AcidState UserTable, AcidState UrlTable)

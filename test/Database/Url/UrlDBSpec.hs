@@ -5,8 +5,8 @@ import Relude.Unsafe (fromJust)
 import Test.Hspec
 
 import Database.Test.Aux
-import Database.Database hiding (deleteUrl, genUUID)
 import Database.Common
+import Database.Database hiding (deleteUrl, genUUID)
 import Database.Url.Url
 import Database.Url.UrlDB
 import Database.User.User
