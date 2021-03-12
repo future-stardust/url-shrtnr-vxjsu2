@@ -2,14 +2,15 @@ module Main where
 
 import Relude
 
+import Server.Server
+import Server.Types
+import Database.Database
+import Control.Exception
+
 main :: IO ()
-main = putTextLn "kek"
-  -- args <- getArgs
-  -- database <- openLocalStateFrom "myDatabase/" (Database $ singleton
-  --                                               $ Url "kek" "kek" $ User "lol" "lol" )
-  -- if null args
-  --   then do messages <- query database (QueryDB urlEmpty)
-  --           putStrLn "Last 10 messages:"
-  --           print messages
-  --   else do update database (InsertDB $ Url "First" "Second" $ User "Uname" "mail")
-  --           putStrLn "Your message has been added to the database."
+main = do
+  putTextLn "kek" -- yes, this must be here at all costs
+  bracket (openDB "database")
+    closeDB
+    (up . AppCtx)
+

@@ -13,8 +13,9 @@ import           Server.API.Urls
 import           Server.API.Users
 
 import           Relude
+import Servant.API.Flatten
 
-type API = Users :<|> Urls :<|> Redirect
+type API = Flat (Users :<|> Urls :<|> Redirect)
 
 api :: Proxy API
 api = Proxy

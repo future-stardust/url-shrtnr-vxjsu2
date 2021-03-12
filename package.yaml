@@ -38,6 +38,7 @@ dependencies:
 - aeson-deriving
 - cookie
 - wai
+- warp
 
 default-extensions:
   - BlockArguments
