@@ -51,6 +51,7 @@ library
       Server.Types.Url
       Server.Types.User
       Server.Types.Util
+      Server.Util
   other-modules:
       Paths_url_shortener
   hs-source-dirs:
@@ -134,6 +135,10 @@ test-suite db-test
       Database.Url.UrlSpec
       Database.User.UserDBSpec
       Database.User.UserSpec
+      Server.Handler.RedirectSpec
+      Server.Handler.UrlsSpec
+      Server.Handler.UsersSpec
+      Server.UtilSpec
       Paths_url_shortener
   hs-source-dirs:
       test
@@ -156,14 +161,19 @@ test-suite db-test
     , base >=4.7 && <5
     , cereal ==0.5.*
     , cookie
+    , directory
     , exceptions ==0.10.*
     , filepath ==1.4.*
     , haskey-btree ==0.3.*
     , hspec ==2.7.*
+    , hspec-wai
+    , http-client
+    , http-types
     , mtl ==2.2.*
     , relude ==0.7.*
     , safecopy ==0.10.*
     , servant
+    , servant-client
     , servant-flatten
     , servant-server
     , temporary ==1.3.*

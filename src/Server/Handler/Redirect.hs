@@ -17,6 +17,6 @@ redirectH alias = do
   res <- liftIO . runDB tbs $ queryUrl alias
 
   case res of
-    Right (Just orig) -> throwError err302 { errBody = encodeUtf8 orig }
+    Right (Just orig) -> throwError err302 { errHeaders = [("Location", encodeUtf8 orig)] }
     Right Nothing     -> throwError err404 { errBody = "Alias not found" }
     Left e            -> throwError $ dbToServerError e
