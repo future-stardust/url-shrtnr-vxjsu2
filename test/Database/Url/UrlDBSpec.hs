@@ -6,10 +6,8 @@ import Test.Hspec
 
 import Database.Test.Aux
 import Database.Common
-import Database.Database hiding (deleteUrl, genUUID)
-import Database.Url.Url
+import Database.Database hiding (queryUrl, deleteUrl, genUUID)
 import Database.Url.UrlDB
-import Database.User.User
 import Database.User.UserDB
 
 spec :: Spec

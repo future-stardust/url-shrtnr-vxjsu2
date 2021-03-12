@@ -5,7 +5,6 @@ module Database.Test.Aux
   ) where
 
 import Database.Database
-import Database.State
 
 import Control.Exception
 import Control.Monad.Catch (MonadMask)
