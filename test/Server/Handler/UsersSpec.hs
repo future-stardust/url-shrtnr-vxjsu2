@@ -1,3 +1,6 @@
+{-# LANGUAGE DataKinds     #-}
+{-# LANGUAGE TypeOperators #-}
+
 module Server.Handler.UsersSpec (spec) where
 
 import           Control.Exception
@@ -13,8 +16,9 @@ import           System.IO.Temp
 
 import           Test.Hspec
 
-import           Database.Database        as D
 import           Relude
+
+import           Database.Database        as D
 import           Server.API.Users
 
 withUserApp :: FilePath -> (Warp.Port -> IO ()) -> IO ()
@@ -22,7 +26,7 @@ withUserApp db action = do
   bracket (D.openDB db)
     D.closeDB
     (\tbs -> do
-      Warp.testWithApplication (pure . app $ AppCtx tbs) action)
+      Warp.testWithApplication (app $ AppCtx tbs) action)
 
 spec :: Spec
 spec = do
@@ -31,7 +35,10 @@ spec = do
 
   around (withUserApp tmp_db) $ do
 
-    let signup :<|> signin :<|> signout = client (Proxy :: Proxy Users)
+    let api :: Proxy (SignUp :<|> SignIn :<|> BasicAuth "test" T.User :> SignOut)
+        api = Proxy
+
+    let signup :<|> signin :<|> signout = client api
 
     baseUrl <- runIO $ parseBaseUrl "http://localhost"
     manager <- runIO $ newManager defaultManagerSettings
@@ -46,10 +53,10 @@ spec = do
       it "/signin" $ \port -> do
         let usr = T.User "test@test.com" "testpasswd"
         got <- runClientM (signin usr) $ clientEnv port
-        got `shouldBe` Right (Token "test@test.com\ntestpasswd")
+        getHeaders <$> got `shouldSatisfy` isRight
 
       it "/signout" $ \port -> do
-        got <- runClientM (signout) $ clientEnv port
-        got `shouldBe` Right NoContent
+        got <- runClientM (signout (BasicAuthData "test@test.com" "testpasswd")) $ clientEnv port
+        getHeaders <$> got `shouldSatisfy` isRight
 
   runIO $ removeDirectoryRecursive tmp_db

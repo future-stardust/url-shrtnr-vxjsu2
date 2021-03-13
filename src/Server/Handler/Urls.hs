@@ -5,26 +5,21 @@ module Server.Handler.Urls
   )
 where
 
-import           Server.Types      as T
+import           Servant
+import           Servant.Auth.Server
+
+import           Relude
 
 import           Database.Common
 import           Database.Database
-import           Database.Url.Url  as U
-import           Relude
-import           Servant
-import           Server.Types.Util (dbToServerError)
+import           Database.Url.Url    as U
+import           Server.Types        as T
+import           Server.Types.Util   (dbToServerError)
 import           Server.Util
 
-shortenH :: ShortenReqBody -> Maybe Token -> HandlerT ShortenedUrl
-shortenH _                  Nothing  = throwError err404 { errBody = "Cookie is missing" }
-shortenH ShortenReqBody{..} (Just t) = do
-  let d = tokenToData t
-  name <- case d of
-            Just (n, _) -> return n
-            Nothing     -> throwError err500 { errBody = "Can't decode cookies" }
-
+shortenH :: AuthResult T.User -> ShortenReqBody -> HandlerT ShortenedUrl
+shortenH (Authenticated T.User{..}) ShortenReqBody{..} = do
   tbs <- asks tables
-
   shUrl <- case srbAlias of
              Just al -> return al
              Nothing -> do
@@ -34,38 +29,30 @@ shortenH ShortenReqBody{..} (Just t) = do
                  Left e     -> throwError $ dbToServerError e
 
   let url = U.Url srbUrl shUrl
-  res <- liftIO . runDB tbs $ createUrl url name
+  res <- liftIO . runDB tbs $ createUrl url userEmail
   case res of
     Right () -> return $ ShortenedUrl shUrl
     Left  e  -> throwError $ dbToServerError e
+shortenH _                          _                  = throwError err401
 
-listUrlsH :: Maybe Token -> HandlerT [ShortUrl]
-listUrlsH Nothing  = throwError err401
-listUrlsH (Just t) = do
-  let d = tokenToData t
-  name <- case d of
-            Just (n, _) -> return n
-            Nothing -> throwError err500 { errBody = "Can't decode cookies" }
+listUrlsH :: AuthResult T.User -> HandlerT [ShortUrl]
+listUrlsH (Authenticated T.User{..}) = do
   tbs <- asks tables
-  res <- liftIO . runDB tbs $ getUserUrls name
+  res <- liftIO . runDB tbs $ getUserUrls userEmail
   case res of
     Right (Just urls) -> return urls
     Right Nothing     -> throwError err404 { errBody = "Can't find such user" }
     Left  e           -> throwError $ dbToServerError e
+listUrlsH _                          = throwError err401
 
 
-deleteUrlH :: Text -> Maybe Token -> HandlerT NoContent
-deleteUrlH _     Nothing  = throwError err401
-deleteUrlH alias (Just t) = do
-  let d = tokenToData t
-  name <- case d of
-            Just (n, _) -> return n
-            Nothing -> throwError err500 { errBody = "Can't decode cookies" }
-
+deleteUrlH :: AuthResult T.User -> Text -> HandlerT NoContent
+deleteUrlH (Authenticated T.User{..}) alias = do
   tbs <- asks tables
 
-  res <- liftIO . runDB tbs $ deleteUrl alias name
+  res <- liftIO . runDB tbs $ deleteUrl alias userEmail
 
   case res of
     Right () -> return NoContent
     Left  e  -> throwError $ dbToServerError e
+deleteUrlH _                          _     = throwError err401

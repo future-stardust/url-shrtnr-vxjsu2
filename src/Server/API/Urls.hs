@@ -3,20 +3,23 @@
 
 module Server.API.Urls
   ( Urls
+  , Shorten
+  , ListUrls
+  , DeleteUrl
   )
 where
 
 import           Data.Text       (Text)
-import           Database.Common
 import           Servant.API
+
+import           Database.Common
 import           Server.Types
 
-type Shorten = "urls" :> "shorten" :> ReqBody '[JSON] ShortenReqBody :>
-  Header "Cookie" Token :> Post '[JSON] ShortenedUrl
+type Shorten = "urls" :> "shorten" :> ReqBody '[JSON] ShortenReqBody :> Post '[JSON] ShortenedUrl
 
-type ListUrls = "urls" :> Header "Cookie" Token :> Get '[JSON] [ShortUrl]
+type ListUrls = "urls" :> Get '[JSON] [ShortUrl]
 
-type DeleteUrl = "urls" :> Capture "alias" Text :> Header "Cookie" Token :> Delete '[JSON] NoContent
+type DeleteUrl = "urls" :> Capture "alias" Text :> Delete '[JSON] NoContent
 
 
-type Urls = Shorten :<|> ListUrls :<|> DeleteUrl
+type Urls = (Shorten :<|> ListUrls :<|> DeleteUrl)

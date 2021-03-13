@@ -13,9 +13,7 @@ import           Server.Types.Util
 redirectH :: Text -> HandlerT NoContent
 redirectH alias = do
   tbs <- asks tables
-
   res <- liftIO . runDB tbs $ queryUrl alias
-
   case res of
     Right (Just orig) -> throwError err302 { errHeaders = [("Location", encodeUtf8 orig)] }
     Right Nothing     -> throwError err404 { errBody = "Alias not found" }

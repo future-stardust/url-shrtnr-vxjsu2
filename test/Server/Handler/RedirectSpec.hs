@@ -13,17 +13,22 @@ import           System.IO.Temp
 
 import           Test.Hspec
 
-import           Database.Database        as D
 import           Relude
+
+import           Database.Database        as D
+import           Network.HTTP.Types
 import           Server.API.Redirect
-import Network.HTTP.Types
 
 withUserApp :: FilePath -> (Warp.Port -> IO ()) -> IO ()
 withUserApp db action = do
   bracket (D.openDB db)
     D.closeDB
     (\tbs -> do
-      Warp.testWithApplication (pure . app $ AppCtx tbs) action)
+      let usr = D.User "test@test.com" [] "testpasswd"
+          url = D.Url "original_test" "test_alias"
+      void . D.runDB tbs $ D.createUser usr -- create test user before running tests
+      void . D.runDB tbs $ D.createUrl url "test@test.com" -- create test url
+      Warp.testWithApplication (app $ AppCtx tbs) action)
 
 spec :: Spec
 spec = do
@@ -41,10 +46,13 @@ spec = do
     describe "/r" $ do
       it "/test_alias" $ \port -> do
         got <- runClientM (redirect "test_alias") $ clientEnv port
+
+        -- We expect redirect
         let expected (Left (FailureResponse _ Response{..})) =
-              statusCode responseStatusCode == 302
-              && any (\(hn, hb) -> hn == "Location" && hb == "original_test") responseHeaders
+              statusCode responseStatusCode == 302 -- 302 status code
+              && any (\(hn, hb) -> hn == "Location" && hb == "original_test") responseHeaders -- and Location with "original_test"
             expected _ = False
+
         got `shouldSatisfy` expected
 
   runIO $ removeDirectoryRecursive tmp_db

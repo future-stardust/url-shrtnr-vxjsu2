@@ -80,6 +80,8 @@ library
     , relude ==0.7.*
     , safecopy ==0.10.*
     , servant
+    , servant-auth
+    , servant-auth-server
     , servant-flatten
     , servant-server
     , text ==1.2.*
@@ -117,6 +119,8 @@ executable shortener
     , relude ==0.7.*
     , safecopy ==0.10.*
     , servant
+    , servant-auth
+    , servant-auth-server
     , servant-flatten
     , servant-server
     , text ==1.2.*
@@ -173,6 +177,8 @@ test-suite db-test
     , relude ==0.7.*
     , safecopy ==0.10.*
     , servant
+    , servant-auth
+    , servant-auth-server
     , servant-client
     , servant-flatten
     , servant-server

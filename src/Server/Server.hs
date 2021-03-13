@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 module Server.Server
   ( server
   , app
@@ -5,26 +6,41 @@ module Server.Server
   )
 where
 
+import           Network.Wai.Handler.Warp (run)
 import           Servant
 
 import           Relude
 
+import           Servant.Auth.Server
 import           Server.API
+import           Server.Auth
 import           Server.Handler
 import           Server.Types
-import Network.Wai.Handler.Warp (run)
 
 
-serverT :: ServerT API HandlerT
-serverT = signUpH :<|> signInH :<|> signOutH
-          :<|> shortenH :<|> listUrlsH :<|> deleteUrlH
-          :<|> redirectH
+serverT :: JWTSettings -> CookieSettings -> ServerT API HandlerT
+serverT jwts cks = signUpH
+  :<|> signInH cks jwts
+  :<|> signOutH cks
+  :<|> shortenH
+  :<|> listUrlsH
+  :<|> deleteUrlH
+  :<|> redirectH
 
-server :: AppCtx -> Server API
-server ctx = hoistServer api (toH ctx) serverT
+context :: Proxy '[JWTSettings, CookieSettings, BasicAuthCfg]
+context = Proxy
 
-app :: AppCtx -> Application
-app ctx = serve api $ server ctx
+server :: AppCtx -> JWTSettings -> CookieSettings -> Server API
+server ctx jwts cks = hoistServerWithContext api context (toH ctx) $ serverT jwts cks
+
+app :: AppCtx -> IO Application
+app ctx@(AppCtx tbs) = do
+  key <- generateKey
+  let jwtCfg = defaultJWTSettings key
+      authCfg = authCheck tbs
+      cookieCfg = defaultCookieSettings
+      cfg = jwtCfg :. cookieCfg :. authCfg :. EmptyContext
+  return . serveWithContext api cfg $ server ctx jwtCfg cookieCfg
 
 up :: AppCtx -> IO ()
-up ctx = run 8080 $ app ctx
+up ctx = run 8080 =<< app ctx
