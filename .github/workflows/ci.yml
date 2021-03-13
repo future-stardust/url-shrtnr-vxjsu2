@@ -1,4 +1,11 @@
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - dev
+      - 'ci-*'
+
 name: CI
 
 jobs:
@@ -28,12 +35,12 @@ jobs:
         path: ~/.stack/
         key: stack-${{ matrix.config.os }}-${{ matrix.config.resolver }}
         
-    # - name: Install codecov
-    #   run: |
-    #     sudo apt-get update -y && sudo apt-get install -y libcurl4-gnutls-dev
-    #     git clone --depth=1 https://github.com/8c6794b6/codecov-haskell.git
-    #     cd codecov-haskell
-    #     stack install
+    - name: Install codecov
+      run: |
+        git clone --depth=1 https://github.com/dedifferentiator/codecov-haskell.git
+        cd codecov-haskell
+        stack install
+        cd ..
         
 
     - name: Install dependencies
@@ -48,9 +55,11 @@ jobs:
       run: |
         stack test --system-ghc --coverage
 
-    # - name: Upload coverage
-    #   run: |
-    #     TIX=$(find .stack-work -name 'db-test.tix' | head -1)
-    #     MIX=$(find .stack-work/dist/* -iname "*.mix" | cut -d/ -f1-6)
-    #     export PATH=/home/runner/.local/bin:$PATH
-    #     codecov-haskell --display-report --tix=$TIX --mix-dir=$MIX db-test
+    - name: Upload coverage
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      run: |
+        TIX=$(find .stack-work -name 'db-test.tix' | head -1)
+        MIXDIR=$(find .stack-work/dist/*/*/ -name "hpc")
+        export PATH=/home/runner/.local/bin:$PATH
+        codecov-haskell --display-report --print-response --tix=$TIX --mix-dir=$MIXDIR db-test
