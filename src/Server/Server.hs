@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds #-}
+
 module Server.Server
   ( server
   , app
@@ -34,10 +35,10 @@ server :: AppCtx -> JWTSettings -> CookieSettings -> Server API
 server ctx jwts cks = hoistServerWithContext api context (toH ctx) $ serverT jwts cks
 
 app :: AppCtx -> IO Application
-app ctx@(AppCtx tbs) = do
+app ctx = do
   key <- generateKey
   let jwtCfg = defaultJWTSettings key
-      authCfg = authCheck tbs
+      authCfg = authCheck $ tables ctx
       cookieCfg = defaultCookieSettings
       cfg = jwtCfg :. cookieCfg :. authCfg :. EmptyContext
   return . serveWithContext api cfg $ server ctx jwtCfg cookieCfg

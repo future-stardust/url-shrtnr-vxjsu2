@@ -1,16 +1,21 @@
+{-# LANGUAGE ScopedTypeVariables #-}
+
 module Main where
 
-import Relude
+import           Colog
 
-import Server.Server
-import Server.Types
-import Database.Database
-import Control.Exception
+import           Relude
+
+import           Control.Exception
+import           Database.Database
+import           Server.Server
+import           Server.Types
 
 main :: IO ()
 main = do
+  let logger = LogAction putTextLn
   putTextLn "kek" -- yes, this must be here at all costs
   bracket (openDB "database")
     closeDB
-    (up . AppCtx)
+    (up . flip AppCtx logger)
 

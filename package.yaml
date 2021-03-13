@@ -23,6 +23,7 @@ dependencies:
 - relude       >= 0.7 && < 0.8
 - text         >= 1.2 && < 1.3
 - mtl          >= 2.2  && < 2.3
+- co-log
 
 # database
 - acid-state   >= 0.16 && < 0.17
@@ -102,3 +103,4 @@ tests:
     - http-client
     - http-types
     - directory
+    - co-log

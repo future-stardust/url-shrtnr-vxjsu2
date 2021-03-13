@@ -1,5 +1,6 @@
 module Server.Util where
 
+import           Colog              (LogAction, (<&))
 import           Data.List.NonEmpty ((!!))
 import           Relude
 
@@ -16,3 +17,6 @@ shortenWithAlphabet a i = rest <> toText [digit]
     rest = if remainder > 0
            then shortenWithAlphabet a remainder
            else ""
+
+logWith :: MonadIO m => LogAction IO Text -> Text -> m ()
+logWith log msg = void . liftIO $ log <& msg

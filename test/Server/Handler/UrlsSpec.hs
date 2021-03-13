@@ -11,6 +11,8 @@ import           Servant.Client
 import           Server.Server
 import           Server.Types             as T
 
+import           Colog
+
 import           System.Directory
 import           System.IO.Temp
 
@@ -27,8 +29,9 @@ withUserApp db action = do
     D.closeDB
     (\tbs -> do
       let usr = D.User "test@test.com" [] "testpasswd"
+          appCtx = AppCtx tbs (LogAction . const $ return ())
       void . D.runDB tbs $ D.createUser usr -- create test user before running tests
-      Warp.testWithApplication (app $ AppCtx tbs) action)
+      Warp.testWithApplication (app appCtx) action)
 
 spec :: Spec
 spec = do

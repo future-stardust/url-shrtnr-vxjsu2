@@ -1,3 +1,5 @@
+{-# LANGUAGE DataKinds #-}
+
 module Server.Auth where
 
 import           Servant
@@ -19,6 +21,8 @@ authCheck tbs (BasicAuthData name passw) = do
     _              -> return SAS.Indefinite
 
 type instance BasicAuthCfg = BasicAuthData -> IO (AuthResult T.User)
+
+type AuthNoContent = (Headers '[Header "Set-Cookie" SetCookie, Header "Set-Cookie" SetCookie] NoContent)
 
 instance FromBasicAuthData T.User where
   fromBasicAuthData authData authCheckFunction = authCheckFunction authData

@@ -11,6 +11,8 @@ import           Servant.Client
 import           Server.Server
 import           Server.Types             as T
 
+import           Colog
+
 import           System.Directory
 import           System.IO.Temp
 
@@ -26,7 +28,8 @@ withUserApp db action = do
   bracket (D.openDB db)
     D.closeDB
     (\tbs -> do
-      Warp.testWithApplication (app $ AppCtx tbs) action)
+      let appCtx = AppCtx tbs (LogAction . const $ return ())
+      Warp.testWithApplication (app appCtx) action)
 
 spec :: Spec
 spec = do

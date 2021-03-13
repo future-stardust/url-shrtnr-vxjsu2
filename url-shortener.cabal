@@ -73,6 +73,7 @@ library
     , aeson
     , aeson-deriving
     , base >=4.7 && <5
+    , co-log
     , cookie
     , filepath ==1.4.*
     , haskey-btree ==0.3.*
@@ -112,6 +113,7 @@ executable shortener
     , aeson
     , aeson-deriving
     , base >=4.7 && <5
+    , co-log
     , cookie
     , filepath ==1.4.*
     , haskey-btree ==0.3.*
@@ -164,6 +166,7 @@ test-suite db-test
     , aeson-deriving
     , base >=4.7 && <5
     , cereal ==0.5.*
+    , co-log
     , cookie
     , directory
     , exceptions ==0.10.*
