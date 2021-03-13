@@ -1,4 +1,11 @@
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - dev
+      - 'ci-*'
+
 name: CI
 
 jobs:
@@ -30,8 +37,6 @@ jobs:
         
     - name: Install codecov
       run: |
-        env
-        sudo apt-get update -y && sudo apt-get install -y libcurl4-gnutls-dev tree
         git clone --depth=1 https://github.com/dedifferentiator/codecov-haskell.git
         cd codecov-haskell
         stack install
