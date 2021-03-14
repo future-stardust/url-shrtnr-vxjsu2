@@ -19,7 +19,7 @@ type Shorten = "urls" :> "shorten" :> ReqBody '[JSON] ShortenReqBody :> Post '[J
 
 type ListUrls = "urls" :> Get '[JSON] [ShortUrl]
 
-type DeleteUrl = "urls" :> Capture "alias" Text :> Delete '[JSON] NoContent
+type DeleteUrl = "urls" :> Capture "alias" Text :> Verb 'DELETE 204 '[JSON] NoContent
 
 
 type Urls = (Shorten :<|> ListUrls :<|> DeleteUrl)
