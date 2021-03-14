@@ -9,4 +9,4 @@ where
 import           Relude
 import           Servant.API
 
-type Redirect = "r" :> Capture "alias" Text :> Get '[JSON] NoContent
+type Redirect = "r" :> Capture "alias" Text :> Verb 'GET 301 '[PlainText] (Headers '[Header "Location" Text] NoContent)

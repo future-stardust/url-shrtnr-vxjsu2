@@ -1,3 +1,5 @@
+{-# LANGUAGE DataKinds #-}
+
 module Server.Handler.Redirect
   ( redirectH
   )
@@ -11,7 +13,7 @@ import           Server.Types
 import           Server.Types.Util
 import           Server.Util       (logWith)
 
-redirectH :: Text -> HandlerT NoContent
+redirectH :: Text -> HandlerT (Headers '[Header "Location" Text] NoContent)
 redirectH alias = do
   log <- asks logger
   logWith log $ "Redirecting by alias " <> alias

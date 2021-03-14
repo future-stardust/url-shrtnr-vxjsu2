@@ -42,6 +42,7 @@ dependencies:
 - cookie
 - wai
 - warp
+- warp-tls
 
 default-extensions:
   - BlockArguments

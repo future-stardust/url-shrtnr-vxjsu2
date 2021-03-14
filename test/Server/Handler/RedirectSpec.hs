@@ -58,6 +58,6 @@ spec = do
             expected _ = False
 
         -- This thing fails on successfull redirect. When you try to test it, after it got original url and redirects you by it, it follows the redirect, instead of outputting response
-        got `shouldNotSatisfy` expected
+        expected got `shouldBe` False
 
   runIO $ removeDirectoryRecursive tmp_db

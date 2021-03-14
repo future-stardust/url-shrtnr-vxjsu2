@@ -88,6 +88,7 @@ library
     , text ==1.2.*
     , wai
     , warp
+    , warp-tls
   default-language: Haskell2010
 
 executable shortener
@@ -129,6 +130,7 @@ executable shortener
     , url-shortener
     , wai
     , warp
+    , warp-tls
   default-language: Haskell2010
 
 test-suite db-test
@@ -190,4 +192,5 @@ test-suite db-test
     , url-shortener
     , wai
     , warp
+    , warp-tls
   default-language: Haskell2010

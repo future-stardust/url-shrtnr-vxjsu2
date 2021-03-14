@@ -7,7 +7,8 @@ module Server.Server
   )
 where
 
-import           Network.Wai.Handler.Warp (run)
+import           Network.Wai.Handler.WarpTLS
+import           Network.Wai.Handler.Warp
 import           Servant
 
 import           Relude
@@ -44,4 +45,4 @@ app ctx = do
   return . serveWithContext api cfg $ server ctx jwtCfg cookieCfg
 
 up :: AppCtx -> IO ()
-up ctx = run 8080 =<< app ctx
+up ctx = runTLS defaultTlsSettings (setPort 8080 defaultSettings) =<< app ctx
