@@ -19,4 +19,4 @@ shortenWithAlphabet a i = rest <> toText [digit]
            else ""
 
 logWith :: MonadIO m => LogAction IO Text -> Text -> m ()
-logWith log msg = void . liftIO $ log <& msg
+logWith log msg = liftIO $ log <& msg

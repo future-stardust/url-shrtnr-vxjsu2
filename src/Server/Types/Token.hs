@@ -13,7 +13,7 @@ import           Relude
 import           Servant
 
 -- | Internal type used in "users/" route. Represents token.
-data Token = Token
+newtype Token = Token
   { tToken :: Text -- ^ The token itself
   }
   deriving (Eq, Show, Generic)

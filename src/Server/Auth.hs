@@ -14,11 +14,11 @@ import           Server.Types        as T
 authCheck :: Tables -> BasicAuthData -> IO (AuthResult T.User)
 authCheck tbs (BasicAuthData name passw) = do
   user <- liftIO . runDB tbs . getUser $ decodeUtf8 name
-  case user of
+  return case user of
     Right (Just u) -> if U.hash u == decodeUtf8 passw
-                      then return . Authenticated $ T.User (U.username u) (U.hash u)
-                      else return SAS.BadPassword
-    _              -> return SAS.Indefinite
+                      then Authenticated $ T.User (U.username u) (U.hash u)
+                      else SAS.BadPassword
+    _              -> SAS.Indefinite
 
 type instance BasicAuthCfg = BasicAuthData -> IO (AuthResult T.User)
 

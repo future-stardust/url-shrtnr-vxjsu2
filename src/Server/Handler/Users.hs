@@ -41,9 +41,10 @@ signInH cookies jwts u@T.User{..} = do
 
   tbs <- asks tables
   res <- liftIO . runDB tbs $ getUser userEmail
-  void $ case res of
-           Right (Just _) -> return ()
-           _              -> throwError err404
+  case res of
+    Right (Just _) -> return ()
+    _              -> throwError err404
+
   appCookies <- liftIO $ acceptLogin cookies jwts u
   case appCookies of
     Nothing -> do

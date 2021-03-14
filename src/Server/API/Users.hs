@@ -15,10 +15,11 @@ import           Servant.API
 import           Server.Auth
 import           Server.Types
 
-type SignUp = "users" :> "signup" :> ReqBody '[JSON] User :> Post '[JSON] NoContent
+type SignUp = "users" :> "signup" :> ReqBody '[JSON] User
+  :> Post '[JSON] NoContent
 
-type SignIn = "users" :> "signin" :> ReqBody '[JSON] User :>
-  Post '[JSON] AuthNoContent
+type SignIn = "users" :> "signin" :> ReqBody '[JSON] User
+  :> Post '[JSON] AuthNoContent
 
 type SignOut = "users" :> "signout" :>
   Post '[JSON] AuthNoContent

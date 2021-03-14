@@ -24,8 +24,8 @@ serverT jwts cks = signUpH
   :<|> signInH cks jwts
   :<|> signOutH cks
   :<|> shortenH
-  :<|> listUrlsH
   :<|> deleteUrlH
+  :<|> listUrlsH
   :<|> redirectH
 
 context :: Proxy '[JWTSettings, CookieSettings, BasicAuthCfg]
@@ -37,10 +37,10 @@ server ctx jwts cks = hoistServerWithContext api context (toH ctx) $ serverT jwt
 app :: AppCtx -> IO Application
 app ctx = do
   key <- generateKey
-  let jwtCfg = defaultJWTSettings key
-      authCfg = authCheck $ tables ctx
+  let jwtCfg    = defaultJWTSettings key
+      authCfg   = authCheck $ tables ctx
       cookieCfg = defaultCookieSettings
-      cfg = jwtCfg :. cookieCfg :. authCfg :. EmptyContext
+      cfg       = jwtCfg :. cookieCfg :. authCfg :. EmptyContext
   return . serveWithContext api cfg $ server ctx jwtCfg cookieCfg
 
 up :: AppCtx -> IO ()

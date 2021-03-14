@@ -12,7 +12,7 @@ import           Server.Types.Util
 import           Relude
 
 -- | Internal type used in "urls/" route. Represents shortened url.
-data ShortenedUrl = ShortenedUrl
+newtype ShortenedUrl = ShortenedUrl
   { suShortenedUrl :: Text -- ^ Shortened url
   }
   deriving (Eq, Show, Generic)
