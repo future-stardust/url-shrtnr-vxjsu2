@@ -1,73 +1,42 @@
-# {Team Name} - URL shortener {🧪}
+# VXJsU2hvcnRlbmVyRmFjdG9yeS5jcmVhdGVXaXRoTWVtYmVycyhqYXZhU3Vja3NGYW5jbGFiKTsK - URL shortener {🧪}
 
-This is a template project for "Software testing" course labs. Use it to create your own repo and 
-fulfill/rewrite this document (at least, replace everything in `{...}`).
 
 ## Students group
 
-- {Surname Name (in Ukrainian)} {email}
-- ...
-- {Surname Name (in Ukrainian)} {email}
+- [@p3rsik](https://github.com/p3rsik)
+- [@dedifferentiator](https://github.com/dedifferentiator)
 
 ## Design document
 
-The [design document]({Place actual link to the design document Google Docs file here}) that
-describes architecture and implementation details of this project.
+[docs](docs)
 
 ### System structure
 
-After the third laboratory assignment groups will switch projects with one another. Because of this,
-all projects have to have the same high-level structure. Also, this is the reason why you should not
-modify project dependencies.
+TODO
 
-Please remember that the main goal of the course is **testing** and everything else is just an 
-implementation harness.
+## Install
+`git clone https://github.com/future-stardust/url-shrtnr-vxjsu2.git`
 
-There are four modules:
-- `auth` **authentication module** - creates new users, authenticates existing ones
-- `bigtable` - **big table** - a key-value persistence storage (please, pay attention that you should implement it by
-  yourself. It means that it is not allowed to use data bases, another key-value storages 
-  implementation, etc)
-- `logic` - **business logic** - logic of URL shortening
-- `rest` - **REST API** - a module that provides a REST API. [Micronaut] framework is already added
-  to project dependencies. It simplifies creation of REST API and provides built-in JWT 
-  authentication.
+`cd url-shrtnr-vxjsu2`
 
-## Environment prerequisites
+`stack install`
 
-### Java
-This is a Java project, so you will need an environment with installed [JDK] 15. For installation, 
-you could use:
-- [sdkman] on Linux/MacOS 
-- [AdoptOpenJDK] on Windows
+## Usage
+All you have to do is ~~follow the damn train~~ run the binary and web-server will start listening to some port, idk which one (should be `8080`), look in `Server/Server.hs`
 
-### IDE  
-As IDE use [IntelliJ Idea Edu].
+`$ shortener`
 
-### Checkstyle
-We use [checkstyle] to ensure coding standards. To get real-time detection in IDE you could use [Checkstyle-IDEA] 
-plugin. We use Google rules (local copy `./config/checkstyle/checkstyle.xml`).
-
-## How to start development
-
-1. Clone this repo
-2. Open the project directory in IntelliJ Idea Edu
-3. Configure IDE code style settings
-  
-    1. Open `Settings`
-    2. Go to `Editor` -> `Code Style` -> `Import Scheme`
-       ![Settings screenshot](./media/code-style-import.png)
-    3. Import scheme from `./config/idea/intellij-java-google-style.xml`
-
-## Commit messages
-
-Write commit messages accordingly by [7 rules of good commit messages].
-  
-[JDK]: https://en.wikipedia.org/wiki/Java_Development_Kit
-[IntelliJ Idea Edu]: https://www.jetbrains.com/idea-edu/
-[sdkman]: https://sdkman.io/
-[AdoptOpenJDK]: https://adoptopenjdk.net/
-[7 rules of good commit messages]: https://chris.beams.io/posts/git-commit/#seven-rules
-[Micronaut]: https://micronaut.io/
-[checkstyle]: https://checkstyle.org/
-[Checkstyle-IDEA]: https://plugins.jetbrains.com/plugin/1065-checkstyle-idea
+### Sign up
+`curl -v -X POST -H "Content-Type: application/json" --data '{"email":"foo","password":"bar"}' http://localhost:8080/users/signup`
+### Sign in
+`curl -v -X POST -H "Content-Type: application/json" --data '{"email":"foo","password":"bar"}' http://localhost:8080/users/signin`
+There will be `JWT-token` in response, use it wisely.
+### Create Url
+##### w/o alias
+`curl -v -X POST -H "Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJkYXQiOnsiZW1haWwiOiJmb28iLCJwYXNzd29yZCI6ImJhciJ9fQ.LlD2LOFalJ-mwxOBR3AqwyvObgbQ4V3A6H9bHlUFqO7vLVBxv7-uu__6r51R2AwYts71_vE2juzxWpOcCyga9g" -H "Content-Type: application/json" --data '{"url": "http://kek.lol"}' http://localhost:8080/urls/shorten`
+##### w/ alias
+`curl -v -X POST -H "Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJkYXQiOnsiZW1haWwiOiJmb28iLCJwYXNzd29yZCI6ImJhciJ9fQ.LlD2LOFalJ-mwxOBR3AqwyvObgbQ4V3A6H9bHlUFqO7vLVBxv7-uu__6r51R2AwYts71_vE2juzxWpOcCyga9g" -H "Content-Type: application/json" --data '{"url": "http://kek.lol", "alias": "arbidol"}' http://localhost:8080/urls/shorten`
+### Get redirected to original url
+`curl -v http://localhost:8080/r/arbidol`
+### Delete url
+`curl -v -X DELETE -H "Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJkYXQiOnsiZW1haWwiOiJmb28iLCJwYXNzd29yZCI6ImJhciJ9fQ.LlD2LOFalJ-mwxOBR3AqwyvObgbQ4V3A6H9bHlUFqO7vLVBxv7-uu__6r51R2AwYts71_vE2juzxWpOcCyga9g" http://localhost:8080/urls/arbidol`
