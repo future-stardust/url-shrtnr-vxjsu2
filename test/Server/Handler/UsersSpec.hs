@@ -58,6 +58,11 @@ spec = do
         got <- runClientM (signin usr) $ clientEnv port
         getHeaders <$> got `shouldSatisfy` isRight
 
+      it "/signin with bad password" $ \port -> do
+        let usr = T.User "test@test.com" "badpassw"
+        got <- runClientM (signin usr) $ clientEnv port
+        getHeaders <$> got `shouldSatisfy` isLeft
+
       it "/signout" $ \port -> do
         got <- runClientM (signout (BasicAuthData "test@test.com" "testpasswd")) $ clientEnv port
         getHeaders <$> got `shouldSatisfy` isRight
