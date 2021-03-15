@@ -13,7 +13,7 @@ import           Relude
 
 import           Server.Types.Util
 
--- | Internal type used in "users/" route. Represents user.
+-- | Internal type used in "users/" route and auth stuff. Represents user.
 data User = User
   { userEmail    :: Text -- ^ User email
   , userPassword :: Text -- ^ User password

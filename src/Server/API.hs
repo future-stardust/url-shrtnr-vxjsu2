@@ -18,6 +18,7 @@ import           Server.API.Urls
 import           Server.API.Users
 import           Server.Types
 
+-- | Service API
 type API = Flat (Users :<|> SA.Auth '[SA.JWT, SA.BasicAuth] User :> Urls :<|> Redirect)
 
 api :: Proxy API

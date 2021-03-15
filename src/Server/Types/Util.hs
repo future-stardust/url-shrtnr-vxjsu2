@@ -7,10 +7,12 @@ import           Data.Aeson.Deriving
 import           Database.Common     (DBError (..))
 import           Servant
 
+-- | Helper alias to derive JSON instances for some types using deriving via
 type Encoding = GenericEncoded
   '[ FieldLabelModifier := [ SnakeCase, DropLowercasePrefix  ]
    ]
 
+-- | Helper function to easily convert from DBError to ServerError
 dbToServerError :: DBError -> ServerError
 dbToServerError dbe = case dbe of
                         EUserExist  -> err409 { errBody = "User with such email already exists" }
