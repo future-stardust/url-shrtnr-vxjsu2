@@ -11,8 +11,13 @@
 [docs](docs)
 
 ### System structure
+ | Module   | Path                                   | Description
+ | -        |-                                       | -
+ | Database | [src/Database](src/Database)           | Top-level functions / common ADT-s
+ | -        | [src/Database/Tree](src/Database/Tree) | Base of database orderable struct (B+-tree at the moment) and its functions)
+ | -        | [src/Database/Url](src/Database/Url)   | `Url` db representation, its instances, queries
+ | -        | [src/Database/User](src/Database/User) | `User` db representation, its instances, queries
 
-TODO
 
 ## Install
 `git clone https://github.com/future-stardust/url-shrtnr-vxjsu2.git`
