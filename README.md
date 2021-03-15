@@ -1,3 +1,6 @@
+[![codecov](https://codecov.io/gh/future-stardust/url-shrtnr-vxjsu2/branch/main/graph/badge.svg?token=TKE9APLK85)](https://codecov.io/gh/future-stardust/url-shrtnr-vxjsu2)
+
+
 # VXJsU2hvcnRlbmVyRmFjdG9yeS5jcmVhdGVXaXRoTWVtYmVycyhqYXZhU3Vja3NGYW5jbGFiKTsK - UWL showtenew { 🥺👉👈 🧪}
 <img align="right" width="250px" src="https://user-images.githubusercontent.com/32426842/111226674-25537500-85ea-11eb-8eb4-9a20bd421a6f.png">
 
