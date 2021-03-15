@@ -7,16 +7,21 @@
 - [@dedifferentiator](https://github.com/dedifferentiator)
 
 ## Design document
-
-[docs](docs)
+          
+[The Glorious Docs](docs)
 
 ### System structure
- | Module   | Path                                   | Description
- | -        |-                                       | -
- | Database | [src/Database](src/Database)           | Top-level functions / common ADT-s
- | -        | [src/Database/Tree](src/Database/Tree) | Base of database orderable struct (B+-tree at the moment) and its functions)
- | -        | [src/Database/Url](src/Database/Url)   | `Url` db representation, its instances, queries
- | -        | [src/Database/User](src/Database/User) | `User` db representation, its instances, queries
+ | Module   | Path                                       | Description
+ | -        | -                                          | -
+ | Database | [src/Database](src/Database)               | Top-level functions / common ADT-s
+ | -        | [src/Database/Tree](src/Database/Tree)     | Base of database orderable struct (B+-tree at the moment) and its functions
+ | -        | [src/Database/Url](src/Database/Url)       | `Url` db representation, its instances, queries
+ | -        | [src/Database/User](src/Database/User)     | `User` db representation, its instances, queries
+ | Server   | [src/Server](src/Server)                   | Server's core: auth, url-to-shortened-url encoding, core reexports, etc
+ | -        | [src/Server/API](src/Server/API)           | Handlers' types according to API specs
+ | -        | [src/Server/Handlers](src/Server/Handlers) | Handlers of web-server
+ | -        | [src/Server/Types](src/Server/Types)       | `Url` and `User` records, monad transformers, conversions between types, auxiliary type aliases
+ 
 
 
 ## Install
@@ -27,7 +32,7 @@
 `stack install`
 
 ## Usage
-All you have to do is ~~follow the damn train~~ run the binary and web-server will start listening to some port, idk which one (should be `8080`), look in `Server/Server.hs`
+All you have to do is ~~follow the damn train~~ run the binary and web-server will start listening to some port, idk which one (should be `8080`), look in `app/.hs`
 
 `$ shortener`
 
@@ -35,6 +40,7 @@ All you have to do is ~~follow the damn train~~ run the binary and web-server wi
 `curl -v -X POST -H "Content-Type: application/json" --data '{"email":"foo","password":"bar"}' http://localhost:8080/users/signup`
 ### Sign in
 `curl -v -X POST -H "Content-Type: application/json" --data '{"email":"foo","password":"bar"}' http://localhost:8080/users/signin`
+
 There will be `JWT-token` in response, use it wisely.
 ### Create Url
 ##### w/o alias
