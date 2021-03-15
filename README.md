@@ -1,73 +1,62 @@
-# {Team Name} - URL shortener {🧪}
+[![codecov](https://codecov.io/gh/future-stardust/url-shrtnr-vxjsu2/branch/main/graph/badge.svg?token=TKE9APLK85)](https://codecov.io/gh/future-stardust/url-shrtnr-vxjsu2)
 
-This is a template project for "Software testing" course labs. Use it to create your own repo and 
-fulfill/rewrite this document (at least, replace everything in `{...}`).
 
-## Students group
+# VXJsU2hvcnRlbmVyRmFjdG9yeS5jcmVhdGVXaXRoTWVtYmVycyhqYXZhU3Vja3NGYW5jbGFiKTsK - UWL showtenew { 🥺👉👈 🧪}
+<img align="right" width="250px" src="https://user-images.githubusercontent.com/32426842/111226674-25537500-85ea-11eb-8eb4-9a20bd421a6f.png">
 
-- {Surname Name (in Ukrainian)} {email}
-- ...
-- {Surname Name (in Ukrainian)} {email}
+## Students gwoup
+
+- [@p3rsik](https://github.com/p3rsik)
+- [@dedifferentiator](https://github.com/dedifferentiator)
 
 ## Design document
+```
+.∧＿∧ 
+( ･ω･｡)つ━☆・*。 
+⊂   ノ    ・゜+. 
+しーＪ   °。+ *´¨) 
+         .· ´¸.·*´¨) 
+        (¸.·´ (¸.·'* ☆ https://github.com/future-stardust/url-shrtnr-vxjsu2/blob/main/README.md
+```
 
-The [design document]({Place actual link to the design document Google Docs file here}) that
-describes architecture and implementation details of this project.
+### S-System stwuctuwe 😳👉👈
+ | Module   | Path                                       | Descwiption
+ | -        | -                                          | -
+ | Database | [src/Database](src/Database)               | Top-level functions / common ADT-s
+ | -        | [src/Database/Tree](src/Database/Tree)     | Base of database owdewable stwuct (B+-twee at the moment) and its functions
+ | -        | [src/Database/Url](src/Database/Url)       | `Url` db repwesentation, its instances, quewies OwO
+ | -        | [src/Database/User](src/Database/User)     | `User` db repwesentation, its instances, quewies 
+ | Sewvew   | [src/Server](src/Server)                   | Sewvew's cowe: auth, uwl-to-showtened-uwl encoding, cowe weexpowts, etc
+ | -        | [src/Server/API](src/Server/API)           | Handlews' types accowding to API specs
+ | -        | [src/Server/Handlers](src/Server/Handlers) | Handlews of web-sewver
+ | -        | [src/Server/Types](src/Server/Types)       | `Url` and `User` wecowds, m-monad twansfowmers, convewsions between types, auxiliawy type aliases
+ 
 
-### System structure
 
-After the third laboratory assignment groups will switch projects with one another. Because of this,
-all projects have to have the same high-level structure. Also, this is the reason why you should not
-modify project dependencies.
+## Install :3
+`git clone https://github.com/future-stardust/url-shrtnr-vxjsu2.git`
 
-Please remember that the main goal of the course is **testing** and everything else is just an 
-implementation harness.
+`cd url-shrtnr-vxjsu2`
 
-There are four modules:
-- `auth` **authentication module** - creates new users, authenticates existing ones
-- `bigtable` - **big table** - a key-value persistence storage (please, pay attention that you should implement it by
-  yourself. It means that it is not allowed to use data bases, another key-value storages 
-  implementation, etc)
-- `logic` - **business logic** - logic of URL shortening
-- `rest` - **REST API** - a module that provides a REST API. [Micronaut] framework is already added
-  to project dependencies. It simplifies creation of REST API and provides built-in JWT 
-  authentication.
+`stack install`
 
-## Environment prerequisites
+## Usage
+All you have to do is ~~follow the damn twain~~ wun the binawy and web-sewver will stawt listening to some powt, idk which one sempai~~ (should be `8080`), look in `app/.hs`
 
-### Java
-This is a Java project, so you will need an environment with installed [JDK] 15. For installation, 
-you could use:
-- [sdkman] on Linux/MacOS 
-- [AdoptOpenJDK] on Windows
+`$ shortener`
 
-### IDE  
-As IDE use [IntelliJ Idea Edu].
+### Sign up
+`curl -v -X POST -H "Content-Type: application/json" --data '{"email":"foo","password":"bar"}' http://localhost:8080/users/signup`
+### Sign in
+`curl -v -X POST -H "Content-Type: application/json" --data '{"email":"foo","password":"bar"}' http://localhost:8080/users/signin`
 
-### Checkstyle
-We use [checkstyle] to ensure coding standards. To get real-time detection in IDE you could use [Checkstyle-IDEA] 
-plugin. We use Google rules (local copy `./config/checkstyle/checkstyle.xml`).
-
-## How to start development
-
-1. Clone this repo
-2. Open the project directory in IntelliJ Idea Edu
-3. Configure IDE code style settings
-  
-    1. Open `Settings`
-    2. Go to `Editor` -> `Code Style` -> `Import Scheme`
-       ![Settings screenshot](./media/code-style-import.png)
-    3. Import scheme from `./config/idea/intellij-java-google-style.xml`
-
-## Commit messages
-
-Write commit messages accordingly by [7 rules of good commit messages].
-  
-[JDK]: https://en.wikipedia.org/wiki/Java_Development_Kit
-[IntelliJ Idea Edu]: https://www.jetbrains.com/idea-edu/
-[sdkman]: https://sdkman.io/
-[AdoptOpenJDK]: https://adoptopenjdk.net/
-[7 rules of good commit messages]: https://chris.beams.io/posts/git-commit/#seven-rules
-[Micronaut]: https://micronaut.io/
-[checkstyle]: https://checkstyle.org/
-[Checkstyle-IDEA]: https://plugins.jetbrains.com/plugin/1065-checkstyle-idea
+Thewe will be `JWT-token` in wesponse, use it wisely.
+### Cweate Url
+##### w/o alias
+`curl -v -X POST -H "Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJkYXQiOnsiZW1haWwiOiJmb28iLCJwYXNzd29yZCI6ImJhciJ9fQ.LlD2LOFalJ-mwxOBR3AqwyvObgbQ4V3A6H9bHlUFqO7vLVBxv7-uu__6r51R2AwYts71_vE2juzxWpOcCyga9g" -H "Content-Type: application/json" --data '{"url": "http://kek.lol"}' http://localhost:8080/urls/shorten`
+##### w/ alias 😈😈🤙🤙🤙
+`curl -v -X POST -H "Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJkYXQiOnsiZW1haWwiOiJmb28iLCJwYXNzd29yZCI6ImJhciJ9fQ.LlD2LOFalJ-mwxOBR3AqwyvObgbQ4V3A6H9bHlUFqO7vLVBxv7-uu__6r51R2AwYts71_vE2juzxWpOcCyga9g" -H "Content-Type: application/json" --data '{"url": "http://kek.lol", "alias": "arbidol"}' http://localhost:8080/urls/shorten`
+### Get rediwected to owiginal uwl
+`curl -v http://localhost:8080/r/arbidol`
+### Delete uwl
+`curl -v -X DELETE -H "Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJkYXQiOnsiZW1haWwiOiJmb28iLCJwYXNzd29yZCI6ImJhciJ9fQ.LlD2LOFalJ-mwxOBR3AqwyvObgbQ4V3A6H9bHlUFqO7vLVBxv7-uu__6r51R2AwYts71_vE2juzxWpOcCyga9g" http://localhost:8080/urls/arbidol`

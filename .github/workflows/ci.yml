@@ -1,0 +1,65 @@
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - dev
+      - 'ci-*'
+
+name: CI
+
+jobs:
+  stack:
+    name: GHC ${{ matrix.ghc }} && Stack ${{ matrix.stack }} 
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        stack: ["2.5.1"]
+        ghc:   ["8.10.3"]
+        config:
+          - { os: ubuntu-latest, resolver: lts-17.2 }
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: haskell/actions/setup@v1
+      name: Setup Haskell Stack
+      with:
+        ghc-version: ${{ matrix.ghc }}
+        enable-stack: true
+        stack-version: ${{ matrix.stack }}
+
+    - uses: actions/cache@v2.1.3
+      name: Cache ~/.stack/
+      with:
+        path: ~/.stack/
+        key: stack-${{ matrix.config.os }}-${{ matrix.config.resolver }}
+        
+    - name: Install codecov
+      run: |
+        git clone --depth=1 https://github.com/dedifferentiator/codecov-haskell.git
+        cd codecov-haskell
+        stack install
+        cd ..
+        
+
+    - name: Install dependencies
+      run: |
+        stack build --system-ghc --test --bench --no-run-tests --no-run-benchmarks --only-dependencies
+
+    - name: Build
+      run: |
+        stack build --system-ghc --test --bench --no-run-tests --no-run-benchmarks
+        
+    - name: Test
+      run: |
+        stack test --system-ghc --coverage
+
+    - name: Upload coverage
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      run: |
+        TIX=$(find .stack-work -name 'db-test.tix' | head -1)
+        MIXDIR=$(find .stack-work/dist/*/*/ -name "hpc")
+        export PATH=/home/runner/.local/bin:$PATH
+        codecov-haskell --display-report --print-response --tix=$TIX --mix-dir=$MIXDIR db-test
