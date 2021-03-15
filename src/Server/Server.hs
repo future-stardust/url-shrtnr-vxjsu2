@@ -44,6 +44,6 @@ app ctx = do
       cfg = jwtCfg :. cookieCfg :. authCfg :. EmptyContext
   return . serveWithContext api cfg $ server ctx jwtCfg cookieCfg
 
--- | Used to start the service up
-up :: AppCtx -> IO ()
-up ctx = run 8080 =<< app ctx
+-- | Start up the service
+up :: Port -> AppCtx -> IO ()
+up = (<=< app) . run
