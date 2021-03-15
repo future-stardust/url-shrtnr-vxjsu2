@@ -17,7 +17,7 @@ import           Server.Types        as T
 import           Server.Types.Util   (dbToServerError)
 import           Server.Util
 
--- | Handler used for /urls shorten endpoint
+-- | Handler for /urls/shorten endpoint
 shortenH :: AuthResult T.User -> ShortenReqBody -> HandlerT ShortenedUrl
 shortenH (Authenticated T.User{..}) b@ShortenReqBody{..} = do
   log <- asks logger
