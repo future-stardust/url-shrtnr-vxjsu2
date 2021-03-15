@@ -4,6 +4,8 @@ import           Colog              (LogAction, (<&))
 import           Data.List.NonEmpty ((!!))
 import           Relude
 
+type Port = Int
+
 alphabet :: NonEmpty Char
 alphabet = '0' :| (['1'..'9'] <> ['a'..'z'] <> ['A'..'Z'])
 
