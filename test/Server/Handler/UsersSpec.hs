@@ -22,6 +22,7 @@ import           Relude
 
 import           Database.Database        as D
 import           Server.API.Users
+import           Server.Handler.Util
 
 withUserApp :: FilePath -> (Warp.Port -> IO ()) -> IO ()
 withUserApp db action = do
@@ -34,7 +35,7 @@ withUserApp db action = do
 spec :: Spec
 spec = do
   tmp <- runIO getCanonicalTemporaryDirectory
-  tmp_db <- runIO $ createTempDirectory tmp "test_db"
+  tmp_db <- runIO $ createTempDirectory tmp dbFileName 
 
   around (withUserApp tmp_db) $ do
 
@@ -43,13 +44,13 @@ spec = do
 
     let signup :<|> signin :<|> signout = client api
 
-    baseUrl <- runIO $ parseBaseUrl "http://localhost"
+    baseUrl <- runIO $ parseBaseUrl testUrl
     manager <- runIO $ newManager defaultManagerSettings
     let clientEnv port = mkClientEnv manager baseUrl { baseUrlPort = port }
 
     describe "/users" $ do
       it "/signup" $ \port -> do
-        let usr = T.User "test@test.com" "testpasswd"
+        let usr = T.User userName userPass
         got <- runClientM (signup usr) $ clientEnv port
         got `shouldBe` Right NoContent
 
@@ -64,7 +65,7 @@ spec = do
         getHeaders <$> got `shouldSatisfy` isLeft
 
       it "/signout" $ \port -> do
-        got <- runClientM (signout (BasicAuthData "test@test.com" "testpasswd")) $ clientEnv port
+        got <- runClientM (signout basicAuthData) $ clientEnv port
         getHeaders <$> got `shouldSatisfy` isRight
 
   runIO $ removeDirectoryRecursive tmp_db

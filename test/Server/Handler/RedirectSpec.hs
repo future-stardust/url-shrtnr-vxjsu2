@@ -20,29 +20,30 @@ import           Relude
 import           Database.Database        as D
 import           Network.HTTP.Types
 import           Server.API.Redirect
+import           Server.Handler.Util
 
 withUserApp :: FilePath -> (Warp.Port -> IO ()) -> IO ()
 withUserApp db action = do
   bracket (D.openDB db)
     D.closeDB
     (\tbs -> do
-      let usr = D.User "test@test.com" [] "testpasswd"
+      let usr = D.User userName [] userPass
           url = D.Url "original_test" "test_alias"
           appCtx = AppCtx tbs (LogAction . const $ return ())
       void . D.runDB tbs $ D.createUser usr -- create test user before running tests
-      void . D.runDB tbs $ D.createUrl url "test@test.com" -- create test url
+      void . D.runDB tbs $ D.createUrl url userName -- create test url
       Warp.testWithApplication (app appCtx) action)
 
 spec :: Spec
 spec = do
   tmp <- runIO getCanonicalTemporaryDirectory
-  tmp_db <- runIO $ createTempDirectory tmp "test_db"
+  tmp_db <- runIO $ createTempDirectory tmp dbFileName
 
   around (withUserApp tmp_db) $ do
 
     let redirect = client (Proxy :: Proxy Redirect)
 
-    baseUrl <- runIO $ parseBaseUrl "http://localhost"
+    baseUrl <- runIO $ parseBaseUrl testUrl
     manager <- runIO $ newManager defaultManagerSettings
     let clientEnv port = mkClientEnv manager baseUrl { baseUrlPort = port }
 

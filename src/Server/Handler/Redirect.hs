@@ -13,6 +13,7 @@ import           Server.Types
 import           Server.Types.Util
 import           Server.Util       (logWith)
 
+-- | /r handler
 redirectH :: Text -> HandlerT (Headers '[Header "Location" Text] NoContent)
 redirectH alias = do
   log <- asks logger

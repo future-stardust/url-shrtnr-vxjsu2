@@ -17,6 +17,7 @@ import           Server.Types        as T
 import           Server.Types.Util   (dbToServerError)
 import           Server.Util
 
+-- | Handler used for /urls shorten endpoint
 shortenH :: AuthResult T.User -> ShortenReqBody -> HandlerT ShortenedUrl
 shortenH (Authenticated T.User{..}) b@ShortenReqBody{..} = do
   log <- asks logger
@@ -43,6 +44,7 @@ shortenH (Authenticated T.User{..}) b@ShortenReqBody{..} = do
       throwError $ dbToServerError e
 shortenH _                          _                  = throwError err401
 
+-- | Handler used for /urls list urls endpoint
 listUrlsH :: AuthResult T.User -> HandlerT [ShortUrl]
 listUrlsH (Authenticated T.User{..}) = do
   log <- asks logger
@@ -57,6 +59,7 @@ listUrlsH (Authenticated T.User{..}) = do
 listUrlsH _                          = throwError err401
 
 
+-- | Handler used for /urls delete endpoint
 deleteUrlH :: AuthResult T.User -> Text -> HandlerT NoContent
 deleteUrlH (Authenticated T.User{..}) alias = do
   log <- asks logger

@@ -10,6 +10,5 @@ spec :: Spec
 spec = do
   describe "shortenWithAlphabet" $ do
     it "https://kek.lol/arbidol" $ do
-      let t = "https://kek.lol/arbidol"
-          got = shortenWithAlphabet alphabet 228
+      let got = shortenWithAlphabet alphabet 228
       got `shouldBe` "3G" -- all things as they should be (pun intended)

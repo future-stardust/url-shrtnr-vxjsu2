@@ -34,6 +34,7 @@ context = Proxy
 server :: AppCtx -> JWTSettings -> CookieSettings -> Server API
 server ctx jwts cks = hoistServerWithContext api context (toH ctx) $ serverT jwts cks
 
+-- | WAI Application
 app :: AppCtx -> IO Application
 app ctx = do
   key <- generateKey
@@ -43,5 +44,6 @@ app ctx = do
       cfg = jwtCfg :. cookieCfg :. authCfg :. EmptyContext
   return . serveWithContext api cfg $ server ctx jwtCfg cookieCfg
 
+-- | Start up the service
 up :: Port -> AppCtx -> IO ()
 up = (<=< app) . run
