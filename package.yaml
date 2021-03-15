@@ -22,13 +22,26 @@ dependencies:
 - base         >= 4.7 && < 5
 - relude       >= 0.7 && < 0.8
 - text         >= 1.2 && < 1.3
+- mtl          >= 2.2  && < 2.3
+- co-log
 
 # database
 - acid-state   >= 0.16 && < 0.17
 - haskey-btree >= 0.3  && < 0.4
 - filepath     >= 1.4  && < 1.5
-- mtl          >= 2.2  && < 2.3
 - safecopy     >= 0.10 && < 0.11
+
+# API
+- servant
+- servant-server
+- servant-auth
+- servant-auth-server
+- servant-flatten
+- aeson
+- aeson-deriving
+- cookie
+- wai
+- warp
 
 default-extensions:
   - BlockArguments
@@ -81,3 +94,13 @@ tests:
     - hspec        >= 2.7  && < 2.8
     - temporary    >= 1.3  && < 1.4
     - url-shortener
+    - warp
+    - wai
+    - hspec-wai
+    - servant
+    - servant-server
+    - servant-client
+    - http-client
+    - http-types
+    - directory
+    - co-log

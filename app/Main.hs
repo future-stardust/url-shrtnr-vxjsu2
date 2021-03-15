@@ -1,15 +1,43 @@
+{-# LANGUAGE ScopedTypeVariables #-}
+
+{-# OPTIONS_GHC -Wno-type-defaults #-}
+
 module Main where
 
-import Relude
+import           Colog
+import           Control.Exception
+
+import           Relude
+
+import           Database.Database
+import           Server.Server
+import           Server.Types
 
 main :: IO ()
-main = putTextLn "kek"
-  -- args <- getArgs
-  -- database <- openLocalStateFrom "myDatabase/" (Database $ singleton
-  --                                               $ Url "kek" "kek" $ User "lol" "lol" )
-  -- if null args
-  --   then do messages <- query database (QueryDB urlEmpty)
-  --           putStrLn "Last 10 messages:"
-  --           print messages
-  --   else do update database (InsertDB $ Url "First" "Second" $ User "Uname" "mail")
-  --           putStrLn "Your message has been added to the database."
+main = do
+  putTextLn "kek" -- yes, this must be here at all costs
+
+  let logger = LogAction putTextLn
+      port   = 8080
+
+  putTextLn   "            _nnnn_"
+  putTextLn $ "           dGGGGMMb     ," <> toText (['\"'| _ <- [0..34]]) <> "."
+  putTextLn $ "          @p~qp~~qMb    | Running at http://localhost:" <> show port <> "/ | "
+  putTextLn   "          M|@||@) M|   _;...................................'"
+  putTextLn   "          @,----.JM| -'"
+  putTextLn   "         JS^\\__/  qKL"
+  putTextLn   "        dZP        qKRb"
+  putTextLn   "       dZP          qKKb"
+  putTextLn   "      fZP            SMMb"
+  putTextLn   "      HZM            MMMM"
+  putTextLn   "      FqM            MMMM"
+  putTextLn   "    __| \".        |\\dS\"qML"
+  putTextLn   "   |    `.       | `' \\Zq"
+  putTextLn   "  _)      \\.___.,|     .'"
+  putTextLn   "  \\____   )MMMMMM|   .'"
+  putTextLn   "       `-'       `--'\""
+
+  bracket (openDB "database")
+    closeDB
+    (up port . flip AppCtx logger)
+
